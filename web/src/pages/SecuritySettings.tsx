@@ -70,7 +70,7 @@ export default function SecuritySettings() {
           <div className="text-center py-16 text-[var(--text-muted)]"><Shield size={40} className="mx-auto mb-3 opacity-30" /><p>Select an office to view its live security details.</p></div>
         ) : loadingDetail ? <Spinner /> : detail && (
           <div className="space-y-5">
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
                 { label: 'Organization', value: detail.office?.organization?.name ?? '—', icon: Building2, color: 'text-primary-700', bg: 'bg-primary-100 dark:bg-primary-900/40' },
                 { label: 'Plan', value: detail.office?.organization?.subscriptionTier ?? '—', icon: Shield, color: 'text-violet-600', bg: 'bg-violet-100 dark:bg-violet-900/40' },
@@ -90,7 +90,7 @@ export default function SecuritySettings() {
               <p className="text-xs text-[var(--text-muted)] mb-4">Controls how employees are verified when they clock in & out from the mobile app.</p>
 
               {/* Toggles */}
-              <div className="grid grid-cols-3 gap-3 mb-5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
                 {[
                   { key: 'deviceBindingEnabled', label: 'Device Binding', sub: 'One phone per employee', icon: Smartphone },
                   { key: 'wifiRequired',         label: 'WiFi Required',   sub: 'Must be on company WiFi', icon: Wifi },
@@ -119,7 +119,7 @@ export default function SecuritySettings() {
               </div>
 
               {/* Work hours + break */}
-              <div className="grid grid-cols-3 gap-3 mt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
                 <div>
                   <label className="flex items-center gap-1.5 text-sm font-semibold text-[var(--text-main)] mb-1.5"><Clock size={13} className="text-[var(--text-muted)]" />Open Time</label>
                   <input type="time" value={settings.openTime ?? '08:00'} onChange={(e) => update('openTime', e.target.value)}
@@ -150,7 +150,7 @@ export default function SecuritySettings() {
                 <div><h3 className="font-bold text-primary-900 dark:text-primary-300">{selectedOffice.name}</h3><p className="text-xs text-primary-600">{selectedOffice.orgName}</p></div>
                 <span className="text-xs text-emerald-600 font-semibold flex items-center gap-1"><div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />{detail.activeSessions} active</span>
               </div>
-              <div className="p-5 grid grid-cols-2 gap-6">
+              <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <h4 className="text-xs font-bold text-[var(--text-muted)] uppercase mb-3">Verification</h4>
                   {[

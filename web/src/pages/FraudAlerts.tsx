@@ -52,7 +52,7 @@ function DetailModal({ alert, onClose, onResolve, onDismiss, onInvestigate }: { 
           <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-main)]"><X size={18}/></button>
         </div>
         <div className="px-6 py-5 space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[['Employee', name], ['Organization', alert.employee?.organization?.name??'—'], ['Severity', alert.severity], ['Status', alert.status], ['Detected', fmt(alert.createdAt)], ['Session', alert.session?.sessionName??'—']].map(([l,v]) => (
               <div key={String(l)} className="bg-[var(--hover-bg)] rounded-xl p-3">
                 <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wide mb-0.5">{l}</p>

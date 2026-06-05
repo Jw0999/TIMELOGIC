@@ -84,10 +84,10 @@ function OrgModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
             <div className="flex items-center justify-between mb-4"><h3 className="font-bold text-[var(--text-main)]">Offices, Work Hours & Penalties</h3><button onClick={() => setForm((p) => ({...p, offices: [...p.offices, newOffice()]}))} className="text-xs font-semibold text-primary-600 flex items-center gap-1"><Plus size={12}/>Add</button></div>
             {form.offices.map((o, i) => (<div key={i} className="p-4 bg-[var(--hover-bg)] rounded-xl border border-[var(--border)] space-y-3 mb-3">
               <div className="flex justify-between"><span className="text-xs font-bold text-[var(--text-muted)]">Office {i+1}</span>{form.offices.length > 1 && <button onClick={() => setForm((p) => ({...p, offices: p.offices.filter((_,idx) => idx !== i)}))} className="text-red-500"><X size={13}/></button>}</div>
-              <div className="grid grid-cols-2 gap-3"><div><label className={lbl}>Name</label><input className={inp} value={o.name} onChange={(e) => updateOffice(i,'name',e.target.value)} placeholder="HQ Lagos"/></div><div><label className={lbl}>Timezone</label><select className={inp} value={o.timezone} onChange={(e) => updateOffice(i,'timezone',e.target.value)}>{TIMEZONES.map((t) => <option key={t}>{t}</option>)}</select></div></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3"><div><label className={lbl}>Name</label><input className={inp} value={o.name} onChange={(e) => updateOffice(i,'name',e.target.value)} placeholder="HQ Lagos"/></div><div><label className={lbl}>Timezone</label><select className={inp} value={o.timezone} onChange={(e) => updateOffice(i,'timezone',e.target.value)}>{TIMEZONES.map((t) => <option key={t}>{t}</option>)}</select></div></div>
               <div><label className={lbl}>Address</label><input className={inp} value={o.address} onChange={(e) => updateOffice(i,'address',e.target.value)} placeholder="Full address"/></div>
               {/* Work hours + break — drives check-in / check-out everywhere */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div><label className={lbl}>Open Time</label><input className={inp} type="time" value={o.openTime} onChange={(e) => updateOffice(i,'openTime',e.target.value)}/></div>
                 <div><label className={lbl}>Close Time</label><input className={inp} type="time" value={o.closeTime} onChange={(e) => updateOffice(i,'closeTime',e.target.value)}/></div>
                 <div><label className={lbl}>Break (min)</label><input className={inp} type="number" min={0} value={o.breakMinutes} onChange={(e) => updateOffice(i,'breakMinutes',e.target.value)}/></div>
@@ -97,7 +97,7 @@ function OrgModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
               {/* Lateness grace + penalties (salary deductions) */}
               <div className="pt-2 border-t border-[var(--border)]">
                 <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">Lateness & Penalties</p>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div><label className={lbl}>Grace (min, no penalty)</label><input className={inp} type="number" min={0} value={o.graceMinutes} onChange={(e) => updateOffice(i,'graceMinutes',e.target.value)}/></div>
                   <div><label className={lbl}>Late after (min from open)</label><input className={inp} type="number" min={0} value={o.lateAfterMinutes} onChange={(e) => updateOffice(i,'lateAfterMinutes',e.target.value)}/></div>
                   <div><label className={lbl}>Penalty after grace (₦)</label><input className={inp} type="number" min={0} value={o.gracePenalty} onChange={(e) => updateOffice(i,'gracePenalty',e.target.value)}/></div>
@@ -109,7 +109,7 @@ function OrgModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
               {/* Break window */}
               <div className="pt-2 border-t border-[var(--border)]">
                 <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">Break Window</p>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div><label className={lbl}>Break Start</label><input className={inp} type="time" value={o.breakStart} onChange={(e) => updateOffice(i,'breakStart',e.target.value)}/></div>
                   <div><label className={lbl}>Break End</label><input className={inp} type="time" value={o.breakEnd} onChange={(e) => updateOffice(i,'breakEnd',e.target.value)}/></div>
                 </div>
@@ -123,20 +123,22 @@ function OrgModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
             <div className="flex items-center justify-between mb-2"><h3 className="font-bold text-[var(--text-main)]">Departments</h3><button onClick={() => setForm((p) => ({...p, departments: [...p.departments, {name:'', breakStart:'13:00', breakEnd:'14:00'}]}))} className="text-xs font-semibold text-primary-600 flex items-center gap-1"><Plus size={12}/>Add</button></div>
             <p className="text-xs text-[var(--text-muted)] mb-4">Each department sets its own break window. Employees inherit it from their department.</p>
             {form.departments.map((d, i) => (
-              <div key={i} className="flex gap-2 items-end mb-3">
+              <div key={i} className="flex flex-col sm:flex-row gap-2 sm:items-end mb-4 sm:mb-3">
                 <div className="flex-1"><label className={lbl}>Department {i+1}</label><input className={inp} value={d.name} onChange={(e) => updateDept(i, 'name', e.target.value)} placeholder="e.g. Engineering"/></div>
-                <div className="w-28"><label className={lbl}>Break Start</label><input className={inp} type="time" value={d.breakStart} onChange={(e) => updateDept(i, 'breakStart', e.target.value)}/></div>
-                <div className="w-28"><label className={lbl}>Break End</label><input className={inp} type="time" value={d.breakEnd} onChange={(e) => updateDept(i, 'breakEnd', e.target.value)}/></div>
-                {form.departments.length > 1 && <button onClick={() => setForm((p) => ({...p, departments: p.departments.filter((_,idx) => idx !== i)}))} className="text-red-500 pb-2.5"><X size={15}/></button>}
+                <div className="flex gap-2">
+                  <div className="flex-1 sm:w-28"><label className={lbl}>Break Start</label><input className={inp} type="time" value={d.breakStart} onChange={(e) => updateDept(i, 'breakStart', e.target.value)}/></div>
+                  <div className="flex-1 sm:w-28"><label className={lbl}>Break End</label><input className={inp} type="time" value={d.breakEnd} onChange={(e) => updateDept(i, 'breakEnd', e.target.value)}/></div>
+                  {form.departments.length > 1 && <button onClick={() => setForm((p) => ({...p, departments: p.departments.filter((_,idx) => idx !== i)}))} className="text-red-500 self-end pb-2.5"><X size={15}/></button>}
+                </div>
               </div>
             ))}
           </div>}
           {step === 4 && <div className="space-y-4">
             <div className="p-3 bg-primary-50 border border-primary-100 rounded-xl text-sm text-primary-700"><strong>Important:</strong> These credentials are for the Admin Desktop Panel.</div>
-            <div className="grid grid-cols-2 gap-4"><div><label className={lbl}>First Name *</label><input className={inp} value={form.admin.firstName} onChange={(e) => updateAdmin('firstName',e.target.value)} placeholder="First name"/></div><div><label className={lbl}>Last Name *</label><input className={inp} value={form.admin.lastName} onChange={(e) => updateAdmin('lastName',e.target.value)} placeholder="Last name"/></div></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label className={lbl}>First Name *</label><input className={inp} value={form.admin.firstName} onChange={(e) => updateAdmin('firstName',e.target.value)} placeholder="First name"/></div><div><label className={lbl}>Last Name *</label><input className={inp} value={form.admin.lastName} onChange={(e) => updateAdmin('lastName',e.target.value)} placeholder="Last name"/></div></div>
             <div><label className={lbl}>Email *</label><input className={inp} type="email" value={form.admin.email} onChange={(e) => updateAdmin('email',e.target.value)} placeholder="admin@company.com"/></div>
             <div><label className={lbl}>Admin Code</label><input className={inp} value={form.admin.employeeCode} onChange={(e) => updateAdmin('employeeCode',e.target.value)} placeholder="ADM001"/></div>
-            <div className="grid grid-cols-2 gap-4"><div><label className={lbl}>Password *</label><input className={inp} type="password" value={form.admin.password} onChange={(e) => updateAdmin('password',e.target.value)} placeholder="Min 8 chars"/></div><div><label className={lbl}>Confirm *</label><input className={inp} type="password" value={form.admin.confirmPassword} onChange={(e) => updateAdmin('confirmPassword',e.target.value)} placeholder="Repeat"/></div></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label className={lbl}>Password *</label><input className={inp} type="password" value={form.admin.password} onChange={(e) => updateAdmin('password',e.target.value)} placeholder="Min 8 chars"/></div><div><label className={lbl}>Confirm *</label><input className={inp} type="password" value={form.admin.confirmPassword} onChange={(e) => updateAdmin('confirmPassword',e.target.value)} placeholder="Repeat"/></div></div>
           </div>}
         </div>
         <div className="flex justify-between px-6 py-4 border-t border-[var(--border)]">
@@ -214,7 +216,7 @@ function EditOrgModal({ org, onClose, onSaved }: { org: any; onClose: () => void
         </div>
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {error && <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-sm text-red-700">{error}</div>}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="col-span-2"><label className={lbl}>Organization Name</label><input className={inp} value={name} onChange={(e) => setName(e.target.value)}/></div>
             <div><label className={lbl}>Plan</label><select className={inp} value={tier} onChange={(e) => setTier(e.target.value)}>{PLANS.map((p) => <option key={p} value={p}>{p[0].toUpperCase()+p.slice(1)}</option>)}</select></div>
           </div>
@@ -223,17 +225,17 @@ function EditOrgModal({ org, onClose, onSaved }: { org: any; onClose: () => void
           <h3 className="font-bold text-[var(--text-main)] pt-2">Offices, Work Hours & WiFi</h3>
           {offices.map((o, i) => (
             <div key={o.id} className="p-4 bg-[var(--hover-bg)] rounded-xl border border-[var(--border)] space-y-3">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div><label className={lbl}>Office Name</label><input className={inp} value={o.name} onChange={(e) => updOffice(i,'name',e.target.value)}/></div>
                 <div><label className={lbl}>Timezone</label><select className={inp} value={o.timezone} onChange={(e) => updOffice(i,'timezone',e.target.value)}>{TIMEZONES.map((t) => <option key={t}>{t}</option>)}</select></div>
               </div>
               <div><label className={lbl}>Address</label><input className={inp} value={o.address} onChange={(e) => updOffice(i,'address',e.target.value)}/></div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div><label className={lbl}>Open Time</label><input className={inp} type="time" value={o.openTime} onChange={(e) => updOffice(i,'openTime',e.target.value)}/></div>
                 <div><label className={lbl}>Close Time</label><input className={inp} type="time" value={o.closeTime} onChange={(e) => updOffice(i,'closeTime',e.target.value)}/></div>
                 <div><label className={lbl}>Break (min)</label><input className={inp} type="number" min={0} value={o.breakMinutes} onChange={(e) => updOffice(i,'breakMinutes',e.target.value)}/></div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div><label className={lbl}>Grace (min, no penalty)</label><input className={inp} type="number" min={0} value={o.graceMinutes} onChange={(e) => updOffice(i,'graceMinutes',e.target.value)}/></div>
                 <div><label className={lbl}>Late after (min from open)</label><input className={inp} type="number" min={0} value={o.lateAfterMinutes} onChange={(e) => updOffice(i,'lateAfterMinutes',e.target.value)}/></div>
                 <div><label className={lbl}>Penalty after grace (₦)</label><input className={inp} type="number" min={0} value={o.gracePenalty} onChange={(e) => updOffice(i,'gracePenalty',e.target.value)}/></div>

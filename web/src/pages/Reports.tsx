@@ -79,7 +79,7 @@ export default function Reports() {
 
         {loading ? <Spinner /> : sysReport ? (
           <>
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
                 { label: 'Total Organizations', value: sysReport.totalOrgs ?? 0, icon: CheckCircle, color: 'text-primary-700', bg: 'bg-primary-100 dark:bg-primary-900/30' },
                 { label: 'Active Employees', value: sysReport.totalEmployees ?? 0, icon: Users, color: 'text-emerald-600', bg: 'bg-emerald-100 dark:bg-emerald-900/30' },
@@ -105,7 +105,7 @@ export default function Reports() {
         <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border)] shadow-sm p-5 transition-colors">
           <h3 className="font-bold text-[var(--text-main)] mb-2">Full Database Export</h3>
           <p className="text-sm text-[var(--text-muted)] mb-4">Includes <strong>all attendance records</strong>, employees, leave requests, break records, and fraud alerts across all organizations.</p>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
               { type: 'excel' as const, label: 'Excel (Multi-Sheet)', sub: 'One tab per data category', icon: FileSpreadsheet, color: 'text-emerald-600' },
               { type: 'csv'   as const, label: 'CSV (All Records)',   sub: 'Flat file — complete data', icon: FileText,       color: 'text-slate-600' },

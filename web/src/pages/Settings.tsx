@@ -145,7 +145,7 @@ export default function Settings() {
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {/* Profile */}
           <SectionCard title="Profile" icon={User}>
             <div className="flex items-center gap-4 mb-5">
@@ -177,7 +177,7 @@ export default function Settings() {
           {/* Appearance */}
           <SectionCard title="Appearance" icon={Sun}>
             <p className="text-xs text-[var(--text-muted)] mb-4">Choose how the dashboard looks to you.</p>
-            <div className="grid grid-cols-3 gap-3 mb-5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
               {THEMES.map(({ key, label, icon: Icon }) => (
                 <button
                   key={key}

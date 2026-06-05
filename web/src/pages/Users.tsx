@@ -83,7 +83,7 @@ function TerminatedModal({ userId, onClose, onReemployed }: { userId: string; on
           {loading ? <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-6 w-6 border-2 border-primary-600 border-t-transparent"/></div>
             : !data ? <p className="text-center text-[var(--text-muted)] py-10">Failed to load.</p>
             : <>
-              <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                 {[['Email',data.user.email],['Code',data.user.employeeCode??'—'],['Org',data.user.organization?.name??'—'],['Dept',data.user.department?.name??'—'],['Joined',fmt(data.user.createdAt)],['Attendance Records',data.user._count?.attendanceRecords??0]].map(([l,v]) => (
                   <div key={String(l)} className="flex justify-between py-2 border-b border-[var(--border)]"><span className="text-[var(--text-muted)]">{l}</span><span className="font-semibold text-[var(--text-main)]">{String(v)}</span></div>
                 ))}
