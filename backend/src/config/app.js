@@ -32,7 +32,13 @@ function createApp() {
     crossOriginResourcePolicy: { policy: 'cross-origin' }, // allow /uploads images in apps
   }));
   app.use(cors({
-    origin: env.CORS_ORIGINS,
+    // Allow the whitelisted web origins, plus native clients with no Origin and
+    // the Electron desktop app (file:// sends Origin "null"). Auth is a Bearer
+    // JWT (not cookies), so permitting null-origin native apps is safe here.
+    origin: (origin, cb) => {
+      if (!origin || origin === 'null' || env.CORS_ORIGINS.includes(origin)) return cb(null, true);
+      return cb(null, false);
+    },
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],

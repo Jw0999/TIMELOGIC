@@ -5,6 +5,7 @@ import {
   UmbrellaOff, Coffee, ShieldAlert, Zap, BarChart3, LogOut, Settings,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import logo from '../assets/logo.jpg';
 
 const NAV = [
   { to: '/dashboard',  label: 'Dashboard',     icon: LayoutDashboard },
@@ -27,7 +28,7 @@ export default function Sidebar() {
       <div className="px-5 py-6 border-b border-primary-800 dark:border-slate-800">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center flex-shrink-0 overflow-hidden">
-            <img src="/logo.jpg" alt="TimeLogic" className="w-8 h-8 object-contain" />
+            <img src={logo} alt="TimeLogic" className="w-8 h-8 object-contain" />
           </div>
           <div>
             <p className="text-white font-bold text-[15px] leading-tight">TimeLogic</p>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Lock, Mail, IdCard, LogIn } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import logo from '../assets/logo.jpg';
 
 export default function Login() {
   const { login } = useAuth();
@@ -35,7 +36,7 @@ export default function Login() {
         {/* Brand */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mx-auto mb-4 shadow-lg overflow-hidden">
-            <img src="/logo.jpg" alt="TimeLogic" className="w-14 h-14 object-contain" />
+            <img src={logo} alt="TimeLogic" className="w-14 h-14 object-contain" />
           </div>
           <h1 className="text-3xl font-black text-white">TimeLogic</h1>
           <p className="text-primary-300 text-sm mt-1">Admin Desktop Panel</p>
