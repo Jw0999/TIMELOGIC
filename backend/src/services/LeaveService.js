@@ -14,11 +14,11 @@ class LeaveService {
       where: { employeeId, leaveType, year: start.getFullYear() },
     });
 
-    if (balance && !balance.hasEnough) {
-      const remaining = balance.remaining - balance.pending;
-      if (totalDays > remaining) {
+    if (balance) {
+      const available = balance.remaining - balance.pending;
+      if (totalDays > available) {
         throw Object.assign(
-          new Error(`Insufficient leave balance. Available: ${remaining} days`),
+          new Error(`Insufficient ${leaveType} balance. You have ${available} day(s) available.`),
           { status: 400 }
         );
       }
@@ -162,26 +162,56 @@ class LeaveService {
     return !!conflict;
   }
 
+  // Default entitlement when the organization hasn't customised a leave type.
+  static DEFAULT_LEAVE_DAYS = { ANNUAL: 14, SICK: 10, CASUAL: 5, MATERNITY: 90, PATERNITY: 14, UNPAID: 0, COMPASSIONATE: 3 };
+
   async initBalances(employeeId, year) {
-    const leaveTypes = ['ANNUAL', 'SICK', 'CASUAL', 'MATERNITY', 'PATERNITY', 'UNPAID', 'COMPASSIONATE'];
-    const defaults = { ANNUAL: 14, SICK: 10, CASUAL: 5, MATERNITY: 90, PATERNITY: 14, UNPAID: 0, COMPASSIONATE: 3 };
+    const leaveTypes = Object.keys(LeaveService.DEFAULT_LEAVE_DAYS);
+
+    // Pull the employee's organization leave policy (Super-Admin configured).
+    const emp = await prisma.user.findUnique({ where: { id: employeeId }, select: { orgId: true } });
+    const org = emp ? await prisma.organization.findUnique({ where: { id: emp.orgId }, select: { leavePolicy: true } }) : null;
+    const policy = (org && org.leavePolicy && typeof org.leavePolicy === 'object') ? org.leavePolicy : {};
+    const daysFor = (lt) => {
+      const v = policy[lt];
+      return (typeof v === 'number' && v >= 0) ? v : LeaveService.DEFAULT_LEAVE_DAYS[lt];
+    };
 
     return Promise.all(
-      leaveTypes.map((lt) =>
-        prisma.leaveBalance.upsert({
+      leaveTypes.map((lt) => {
+        const days = daysFor(lt);
+        return prisma.leaveBalance.upsert({
           where: { employeeId_leaveType_year: { employeeId, leaveType: lt, year } },
-          create: {
-            id: uuidv4(),
-            employeeId,
-            leaveType: lt,
-            year,
-            totalEntitled: defaults[lt],
-            remaining: defaults[lt],
-          },
+          create: { id: uuidv4(), employeeId, leaveType: lt, year, totalEntitled: days, remaining: days },
           update: {},
-        })
-      )
+        });
+      })
     );
+  }
+
+  // Re-apply the org's leave policy to ALL its employees' balances for the year
+  // (used when the Super Admin changes the policy). Adjusts remaining by the delta.
+  async applyPolicyToOrg(orgId, year) {
+    const employees = await prisma.user.findMany({
+      where: { orgId, role: 'EMPLOYEE', status: { not: 'TERMINATED' } }, select: { id: true },
+    });
+    const org = await prisma.organization.findUnique({ where: { id: orgId }, select: { leavePolicy: true } });
+    const policy = (org && org.leavePolicy && typeof org.leavePolicy === 'object') ? org.leavePolicy : {};
+    const types = Object.keys(LeaveService.DEFAULT_LEAVE_DAYS);
+
+    for (const e of employees) {
+      for (const lt of types) {
+        const entitled = (typeof policy[lt] === 'number' && policy[lt] >= 0) ? policy[lt] : LeaveService.DEFAULT_LEAVE_DAYS[lt];
+        const bal = await prisma.leaveBalance.findFirst({ where: { employeeId: e.id, leaveType: lt, year } });
+        if (!bal) {
+          await prisma.leaveBalance.create({ data: { id: uuidv4(), employeeId: e.id, leaveType: lt, year, totalEntitled: entitled, remaining: entitled } });
+        } else {
+          // remaining = entitled - used - (already pending stays)
+          const remaining = Math.max(0, entitled - bal.used);
+          await prisma.leaveBalance.update({ where: { id: bal.id }, data: { totalEntitled: entitled, remaining } });
+        }
+      }
+    }
   }
 
   // ── private ──────────────────────────────────────────────────────────────────

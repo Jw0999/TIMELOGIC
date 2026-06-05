@@ -78,6 +78,43 @@ class AttendanceService {
     return { ok: true, verified: true };
   }
 
+  // ── ADMIN ATTENDANCE (anti-cheat) ───────────────────────────────────────────
+  // An admin must be present (logged in / app open) by openTime - AUTO_CREATE_LEAD,
+  // the same instant the scheduler auto-opens the session. We record the FIRST
+  // presence of the day in Redis; the scheduler then writes a PRESENT/LATE record.
+  async recordAdminPresence(adminId) {
+    try {
+      const key = `${PREFIXES.ADMIN_PRESENT}${adminId}`;
+      const ok = await redis.set(key, String(Date.now()), 'NX'); // first presence wins
+      if (ok) {
+        const eod = new Date(); eod.setHours(23, 59, 59, 999);
+        await redis.pexpireat(key, eod.getTime()).catch(() => {});
+      }
+    } catch (_) { /* best-effort */ }
+  }
+
+  // Called by the scheduler at openTime - lead. Marks every active admin of the org
+  // PRESENT (present by the threshold) or LATE (not present), like an employee.
+  async markAdminAttendance(org, office, session, now) {
+    if (!session) return;
+    const dayStart = new Date(now); dayStart.setHours(0, 0, 0, 0);
+    const admins = await prisma.user.findMany({
+      where: { orgId: org.id, role: 'ADMIN', status: 'ACTIVE' },
+      select: { id: true },
+    });
+    for (const a of admins) {
+      let presentAt = null;
+      try { presentAt = await redis.get(`${PREFIXES.ADMIN_PRESENT}${a.id}`); } catch (_) {}
+      const status = presentAt ? 'PRESENT' : 'LATE';
+      const clockInTime = presentAt ? new Date(Number(presentAt)) : null;
+      await prisma.attendanceRecord.upsert({
+        where: { employeeId_sessionId_date: { employeeId: a.id, sessionId: session.id, date: dayStart } },
+        create: { id: uuidv4(), employeeId: a.id, sessionId: session.id, date: dayStart, status, clockInTime },
+        update: {}, // first write wins; don't overwrite a later state
+      }).catch(() => {});
+    }
+  }
+
   // ── WiFi HEARTBEAT ──────────────────────────────────────────────────────────
   // The app pings this periodically while the employee is clocked in. It tracks
   // live presence, and when someone on break returns to the office Wi-Fi it ends

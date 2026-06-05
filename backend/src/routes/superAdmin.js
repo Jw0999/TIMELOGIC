@@ -19,6 +19,8 @@ router.post('/organizations', [
 router.put('/organizations/:id',                 ctrl.updateOrg);
 router.delete('/organizations/:id',              ctrl.deleteOrg);
 router.get('/organizations/:id/users',           ctrl.orgUsers);
+router.get('/organizations/:id/leave-policy',    ctrl.getLeavePolicy);
+router.put('/organizations/:id/leave-policy',    ctrl.setLeavePolicy);
 router.post('/organizations/:orgId/departments', [
   body('name').notEmpty().withMessage('Department name is required'),
 ], validate, ctrl.addDepartment);

@@ -120,6 +120,9 @@ model Organization {
   name             String
   industry         String?
   subscriptionTier String       @default("basic")
+  // Per-organization leave entitlement, days/year per LeaveType.
+  // e.g. { "ANNUAL": 20, "SICK": 10, ... }. Set by the Super Admin.
+  leavePolicy      Json?
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
 

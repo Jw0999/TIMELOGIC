@@ -7,6 +7,15 @@ const { validate } = require('../middleware/validate');
 const upload = require('../middleware/upload');
 const { prisma } = require('../config/database');
 
+// Admin presence ping — the desktop app calls this on open so the scheduler can
+// mark the admin PRESENT/LATE for the day even when the session token persists.
+router.post('/attendance/ping', authenticate, isAdmin, async (req, res, next) => {
+  try {
+    await require('../services/AttendanceService').recordAdminPresence(req.user.id);
+    res.json({ success: true });
+  } catch (err) { next(err); }
+});
+
 // Organisation
 router.get('/org', authenticate, isAdmin, ctrl.getOrg);
 router.put('/org', authenticate, isSuperAdmin, ctrl.updateOrg);

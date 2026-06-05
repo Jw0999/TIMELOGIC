@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Trash2, X, ChevronRight, ChevronsUpDown, Pencil } from 'lucide-react';
+import { Plus, Trash2, X, ChevronRight, ChevronsUpDown, Pencil, CalendarDays } from 'lucide-react';
 import PageShell from '../components/PageShell';
-import { fetchAllOrgs, createOrg, updateOrg, deleteOrg, fetchOrgUsers } from '../services';
+import { fetchAllOrgs, createOrg, updateOrg, deleteOrg, fetchOrgUsers, fetchLeavePolicy, saveLeavePolicy } from '../services';
 import { downloadCSV } from '../utils/csv';
 
 const INDUSTRIES = ['Technology','Finance','Healthcare','Education','Logistics','Retail','Manufacturing','Non-profit','Government','Other'];
@@ -268,6 +268,7 @@ export default function Organizations() {
   const [showAdd, setShowAdd] = useState(false);
   const [viewOrg, setViewOrg] = useState<any>(null);
   const [editOrg, setEditOrg] = useState<any>(null);
+  const [leaveOrg, setLeaveOrg] = useState<any>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [search,  setSearch]  = useState('');
   const [tab,     setTab]     = useState(0);
@@ -360,6 +361,7 @@ export default function Organizations() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <button onClick={() => setViewOrg(o)} className="text-sm font-semibold text-primary-700 hover:text-primary-900 transition-colors">View</button>
+                        <button onClick={() => setLeaveOrg(o)} title="Leave days" className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-[var(--hover-bg)] text-[var(--text-muted)] hover:text-primary-700 transition-colors"><CalendarDays size={13}/></button>
                         <button onClick={() => setEditOrg(o)} title="Edit" className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-[var(--hover-bg)] text-[var(--text-muted)] hover:text-primary-700 transition-colors"><Pencil size={13}/></button>
                         {o.id !== 'platform-org' && (
                           <button onClick={() => handleDelete(o.id, o.name)} disabled={deleting === o.id}
@@ -379,6 +381,73 @@ export default function Organizations() {
       {showAdd && <OrgModal onClose={() => setShowAdd(false)} onSaved={load}/>}
       {viewOrg  && <UsersModal org={viewOrg} onClose={() => setViewOrg(null)}/>}
       {editOrg  && <EditOrgModal org={editOrg} onClose={() => setEditOrg(null)} onSaved={load}/>}
+      {leaveOrg && <LeavePolicyModal org={leaveOrg} onClose={() => setLeaveOrg(null)}/>}
     </>
+  );
+}
+
+const LEAVE_LABELS: Record<string, string> = {
+  ANNUAL: 'Annual', SICK: 'Sick', CASUAL: 'Casual', MATERNITY: 'Maternity',
+  PATERNITY: 'Paternity', UNPAID: 'Unpaid', COMPASSIONATE: 'Compassionate',
+};
+
+function LeavePolicyModal({ org, onClose }: { org: any; onClose: () => void }) {
+  const [policy, setPolicy] = useState<Record<string, number>>({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetchLeavePolicy(org.id)
+      .then((d) => setPolicy(d?.policy ?? {}))
+      .catch((e) => setError(e?.message ?? 'Failed to load'))
+      .finally(() => setLoading(false));
+  }, [org.id]);
+
+  const save = async () => {
+    setSaving(true); setError('');
+    try {
+      await saveLeavePolicy(org.id, policy);
+      setSaved(true); setTimeout(() => setSaved(false), 2000);
+    } catch (e: any) { setError(e?.message ?? 'Failed to save'); }
+    finally { setSaving(false); }
+  };
+
+  const inp = 'w-24 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--text-main)] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 text-center';
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-[var(--card-bg)] rounded-3xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-hidden flex flex-col border border-[var(--border)]">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-[var(--border)]">
+          <div className="min-w-0">
+            <h2 className="text-lg font-bold text-[var(--text-main)] truncate">Leave Days · {org.name}</h2>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">Days per year for each leave type. Applies to all employees.</p>
+          </div>
+          <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-main)] flex-shrink-0"><X size={20}/></button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-6">
+          {error && <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-xl text-sm text-red-700">{error}</div>}
+          {loading ? <p className="text-sm text-[var(--text-muted)] text-center py-6">Loading…</p> : (
+            <div className="divide-y divide-[var(--border)]">
+              {Object.keys(LEAVE_LABELS).map((lt) => (
+                <div key={lt} className="flex items-center justify-between gap-3 py-2.5">
+                  <span className="text-sm font-semibold text-[var(--text-main)]">{LEAVE_LABELS[lt]}</span>
+                  <input type="number" min={0} className={inp} value={policy[lt] ?? 0}
+                    onChange={(e) => setPolicy((p) => ({ ...p, [lt]: Math.max(0, parseInt(e.target.value || '0', 10)) }))}/>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="flex justify-end gap-3 px-6 py-4 border-t border-[var(--border)]">
+          <button onClick={onClose} className="px-4 py-2 border border-[var(--border)] text-[var(--text-main)] text-sm font-semibold rounded-xl hover:bg-[var(--hover-bg)] transition">Close</button>
+          <button onClick={save} disabled={saving || loading}
+            className={`px-6 py-2 text-white text-sm font-bold rounded-xl transition disabled:opacity-60 ${saved ? 'bg-emerald-500' : 'bg-primary-700 hover:bg-primary-800'}`}>
+            {saved ? 'Saved!' : saving ? 'Saving…' : 'Save Days'}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

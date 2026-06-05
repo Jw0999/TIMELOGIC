@@ -56,6 +56,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('auth:expired', handler);
   }, []);
 
+  // Admin presence: ping on open + every 5 min so the backend can mark the admin
+  // PRESENT/LATE for the day even when the session token persists across days.
+  useEffect(() => {
+    if (!user) return;
+    const ping = () => { api.post('/admin/attendance/ping', {}).catch(() => {}); };
+    ping();
+    const id = setInterval(ping, 5 * 60 * 1000);
+    return () => clearInterval(id);
+  }, [user]);
+
   const login = async (identifier: string, password: string) => {
     try {
       const isEmail = identifier.includes('@');

@@ -17,6 +17,7 @@ const { v4: uuidv4 } = require('uuid');
 const env = require('../config/env');
 const QRTokenService = require('../services/QRTokenService');
 const BreakService = require('../services/BreakService');
+const AttendanceService = require('../services/AttendanceService');
 const logger = require('../config/logger');
 
 let _timer = null;
@@ -57,6 +58,19 @@ async function tick() {
         if (minOfDay === autoCreateMin)   await autoCreate(org, office, now);
         if (minOfDay === closeMin)        await endOfficeSessions(org, office, now);
         if (minOfDay === autoCheckoutMin) await autoCheckout(org, office, now);
+      }
+
+      // Mark the org's admins PRESENT/LATE once per day, at the PRIMARY office's
+      // openTime - lead (same instant the session is guaranteed to exist).
+      const primary = org.offices[0];
+      const pOpen = primary ? toMinutes(primary.openTime) : null;
+      if (pOpen != null && minOfDay === pOpen - env.AUTO_CREATE_LEAD_MIN) {
+        const dayStart = new Date(now); dayStart.setHours(0, 0, 0, 0);
+        const session = await prisma.attendanceSession.findFirst({
+          where: { officeId: primary.id, startTime: { gte: dayStart }, status: { in: ['ACTIVE', 'PAUSED'] } },
+          select: { id: true },
+        });
+        await AttendanceService.markAdminAttendance(org, primary, session, now).catch((e) => logger.warn('admin attendance:', e.message));
       }
     }
 

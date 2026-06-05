@@ -8,6 +8,8 @@ export const updateOrg        = (id: string, body: any) => api.put<any>(`/super/
 export const deleteOrg        = (id: string) => api.delete<any>(`/super/organizations/${id}`);
 export const updateOfficeSecurity = (officeId: string, body: any) => api.put<any>(`/super/offices/${officeId}/settings`, body).then((r) => r.data);
 export const fetchOrgUsers          = (id: string) => api.get<any>(`/super/organizations/${id}/users`).then((r) => r.data ?? []);
+export const fetchLeavePolicy       = (id: string) => api.get<any>(`/super/organizations/${id}/leave-policy`).then((r) => r.data);
+export const saveLeavePolicy        = (id: string, policy: Record<string, number>) => api.put<any>(`/super/organizations/${id}/leave-policy`, { policy }).then((r) => r.data);
 export const addOrgDepartment       = (orgId: string, name: string) => api.post<any>(`/super/organizations/${orgId}/departments`, { name }).then((r) => r.data);
 export const fetchEmployeeRecords   = (userId: string) => api.get<any>(`/super/employees/${userId}/records`).then((r) => r.data);
 export const reemployEmployee       = (userId: string) => api.put<any>(`/super/employees/${userId}/reemploy`, {});

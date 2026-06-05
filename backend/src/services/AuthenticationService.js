@@ -70,6 +70,12 @@ class AuthenticationService {
 
     await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
 
+    // Admin accountability: record presence so the scheduler can mark the admin
+    // PRESENT/LATE for the day (same rule as employees).
+    if (user.role === 'ADMIN') {
+      require('./AttendanceService').recordAdminPresence(user.id).catch(() => {});
+    }
+
     const accessToken = this._signAccess(user);
     const refreshToken = await this._createRefreshToken(user.id);
 

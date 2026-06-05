@@ -19,6 +19,7 @@ const PREFIXES = {
   SOCKET:          'sock:',
   CHALLENGE:       'challenge:',
   PRESENCE:        'presence:',
+  ADMIN_PRESENT:   'adminpresent:',
 };
 
 module.exports = { redis, PREFIXES };

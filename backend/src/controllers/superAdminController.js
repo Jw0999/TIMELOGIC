@@ -584,4 +584,41 @@ const employeeFullRecord = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-module.exports = { listOrgs, createOrg, updateOrg, deleteOrg, orgUsers, systemStats, getNotifications, officeSecurityDetail, updateOfficeSecurity, systemReport, addDepartment, employeeFullRecord, reemployEmployee, suspendAdmin, activateAdmin, reassignEmployee, updateProfile, resetSystem };
+const LEAVE_TYPES = ['ANNUAL', 'SICK', 'CASUAL', 'MATERNITY', 'PATERNITY', 'UNPAID', 'COMPASSIONATE'];
+const DEFAULT_LEAVE_DAYS = { ANNUAL: 14, SICK: 10, CASUAL: 5, MATERNITY: 90, PATERNITY: 14, UNPAID: 0, COMPASSIONATE: 3 };
+
+// GET /super/organizations/:id/leave-policy — current days/year per leave type
+const getLeavePolicy = async (req, res, next) => {
+  try {
+    const org = await prisma.organization.findUnique({
+      where: { id: req.params.id }, select: { leavePolicy: true, name: true },
+    });
+    if (!org) return res.status(404).json({ success: false, message: 'Organization not found.' });
+    const saved = (org.leavePolicy && typeof org.leavePolicy === 'object') ? org.leavePolicy : {};
+    const policy = {};
+    for (const lt of LEAVE_TYPES) policy[lt] = (typeof saved[lt] === 'number') ? saved[lt] : DEFAULT_LEAVE_DAYS[lt];
+    res.json({ success: true, data: { organization: org.name, policy } });
+  } catch (err) { next(err); }
+};
+
+// PUT /super/organizations/:id/leave-policy — set days/year per leave type, then
+// re-apply to every employee's balance for the current year.
+const setLeavePolicy = async (req, res, next) => {
+  try {
+    const incoming = req.body?.policy ?? req.body ?? {};
+    const policy = {};
+    for (const lt of LEAVE_TYPES) {
+      const v = Number(incoming[lt]);
+      policy[lt] = Number.isFinite(v) && v >= 0 ? v : DEFAULT_LEAVE_DAYS[lt];
+    }
+    const org = await prisma.organization.update({
+      where: { id: req.params.id }, data: { leavePolicy: policy }, select: { id: true },
+    }).catch(() => null);
+    if (!org) return res.status(404).json({ success: false, message: 'Organization not found.' });
+
+    await require('../services/LeaveService').applyPolicyToOrg(org.id, new Date().getFullYear());
+    res.json({ success: true, data: { policy } });
+  } catch (err) { next(err); }
+};
+
+module.exports = { listOrgs, createOrg, updateOrg, deleteOrg, orgUsers, systemStats, getNotifications, officeSecurityDetail, updateOfficeSecurity, systemReport, addDepartment, employeeFullRecord, reemployEmployee, suspendAdmin, activateAdmin, reassignEmployee, updateProfile, resetSystem, getLeavePolicy, setLeavePolicy };

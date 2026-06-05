@@ -30,19 +30,22 @@ class SessionService {
     const openMin  = this._toMinutes(office.openTime);
     const closeMin = this._toMinutes(office.closeTime);
 
-    // ── Creation window: from (openTime - SESSION_LEAD) up to closeTime ──
-    if (openMin != null && closeMin != null) {
+    // ── Creation window: from (openTime - SESSION_LEAD) up to the OPEN TIME ──
+    // A session can only be created BEFORE the organization's opening time. Once
+    // the open time passes, manual creation is locked (the scheduler already
+    // auto-creates one at openTime - AUTO_CREATE_LEAD if the admin didn't).
+    if (openMin != null) {
       const windowStart = openMin - env.SESSION_LEAD_MIN;
       if (minOfDay < windowStart) {
         const hh = Math.floor(windowStart / 60), mm = windowStart % 60;
         throw Object.assign(
-          new Error(`Too early. Sessions can be created from ${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')} (30 min before the ${office.openTime} open time).`),
+          new Error(`Too early. Sessions can be created from ${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')} (${env.SESSION_LEAD_MIN} min before the ${office.openTime} open time).`),
           { status: 400 }
         );
       }
-      if (minOfDay > closeMin) {
+      if (minOfDay > openMin) {
         throw Object.assign(
-          new Error(`The work day has ended (closes ${office.closeTime}). No new sessions today.`),
+          new Error(`The ${office.openTime} opening time has passed. Sessions can only be created before the open time; if none was created the system opens one automatically.`),
           { status: 400 }
         );
       }

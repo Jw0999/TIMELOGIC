@@ -17,3 +17,74 @@ sudo pg_ctlcluster 18 main start
 
 ┌──(kelvin㉿kali)-[~/Documents/Attendance Syatem/mobile]
 └─$ npx expo start
+
+
+
+
+now nothing is showing in the desktop app 
+i installed the .deb file 
+┌──(kelvin㉿kali)-[~/Documents/Attendance Syatem/desktop/release]
+└─$ ls
+ attendance-desktop_1.0.0_amd64.deb   linux-unpacked                   'TimeLogic Admin Setup 1.0.0.exe'            win-unpacked
+ builder-debug.yml                   'TimeLogic Admin-1.0.0.AppImage'  'TimeLogic Admin Setup 1.0.0.exe.blockmap'
+                                                                                                                                                                      
+┌──(kelvin㉿kali)-[~/Documents/Attendance Syatem/desktop/release]
+└─$ sudo apt install ./attendance-desktop_1.0.0_amd64.deb
+[sudo] password for kelvin: 
+Note, selecting 'attendance-desktop' instead of './attendance-desktop_1.0.0_amd64.deb'
+Installing:                 
+  attendance-desktop
+
+Summary:
+  Upgrading: 0, Installing: 1, Removing: 0, Not Upgrading: 13
+  Download size: 0 B / 76.9 MB
+  Space needed: 306 MB / 95.7 GB available
+
+Get:1 /home/kelvin/Documents/Attendance Syatem/desktop/release/attendance-desktop_1.0.0_amd64.deb attendance-desktop amd64 1.0.0 [76.9 MB]
+Selecting previously unselected package attendance-desktop.
+(Reading database… 513127 files and directories currently installed.)
+Preparing to unpack …/attendance-desktop_1.0.0_amd64.deb…
+Unpacking attendance-desktop (1.0.0)…
+Setting up attendance-desktop (1.0.0)…
+update-alternatives is /usr/bin/update-alternatives
+update-alternatives: using /opt/TimeLogic Admin/attendance-desktop to provide /usr/bin/attendance-desktop (attendance-desktop) in auto mode
+Processing triggers for hicolor-icon-theme (0.18-2)…
+Processing triggers for desktop-file-utils (0.28-1)…
+Notice: Download is performed unsandboxed as root as file now nothing is showing in the desktop app 
+i installed the .deb file 
+┌──(kelvin㉿kali)-[~/Documents/Attendance Syatem/desktop/release]
+└─$ ls
+ attendance-desktop_1.0.0_amd64.deb   linux-unpacked                   'TimeLogic Admin Setup 1.0.0.exe'            win-unpacked
+ builder-debug.yml                   'TimeLogic Admin-1.0.0.AppImage'  'TimeLogic Admin Setup 1.0.0.exe.blockmap'
+                                                                                                                                                                      
+┌──(kelvin㉿kali)-[~/Documents/Attendance Syatem/desktop/release]
+└─$ sudo apt install ./attendance-desktop_1.0.0_amd64.deb
+[sudo] password for kelvin: 
+Note, selecting 'attendance-desktop' instead of './attendance-desktop_1.0.0_amd64.deb'
+Installing:                 
+  attendance-desktop
+
+Summary:
+  Upgrading: 0, Installing: 1, Removing: 0, Not Upgrading: 13
+  Download size: 0 B / 76.9 MB
+  Space needed: 306 MB / 95.7 GB available
+
+Get:1 /home/kelvin/Documents/Attendance Syatem/desktop/release/attendance-desktop_1.0.0_amd64.deb attendance-desktop amd64 1.0.0 [76.9 MB]
+Selecting previously unselected package attendance-desktop.
+(Reading database… 513127 files and directories currently installed.)
+Preparing to unpack …/attendance-desktop_1.0.0_amd64.deb…
+Unpacking attendance-desktop (1.0.0)…
+Setting up attendance-desktop (1.0.0)…
+update-alternatives is /usr/bin/update-alternatives
+update-alternatives: using /opt/TimeLogic Admin/attendance-desktop to provide /usr/bin/attendance-desktop (attendance-desktop) in auto mode
+Processing triggers for hicolor-icon-theme (0.18-2)…
+Processing triggers for desktop-file-utils (0.28-1)…
+Notice: Download is performed unsandboxed as root as file '/home/kelvin/Documents/Attendance Syatem/desktop/release/attendance-desktop_1.0.0_amd64.deb' couldn't be accessed by user '_apt'. - pkgAcquire::Run (13: Permission denied)
+                                                                                                                                                                      
+┌──(kelvin㉿kali)-[~/Documents/Attendance Syatem/desktop/release]
+└─$ attendance-desktop'/home/kelvin/Documents/Attendance Syatem/desktop/release/attendance-desktop_1.0.0_amd64.deb' couldn't be accessed by user '_apt'. - pkgAcquire::Run (13: Permission denied)
+                                                                                                                                                                      
+┌──(kelvin㉿kali)-[~/Documents/Attendance Syatem/desktop/release]
+└─$ attendance-desktop
+
+make sure that you fix it for both exe and .deb file remove AppImage installation
