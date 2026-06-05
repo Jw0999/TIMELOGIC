@@ -2,7 +2,8 @@
   "name": "attendance-desktop",
   "version": "1.0.0",
   "description": "TimeLogic — Admin Desktop App",
-  "author": "TimeLogic",
+  "author": "TimeLogic <support@timelogic.app>",
+  "homepage": "https://timelogic.pages.dev",
   "main": "electron/main.js",
   "scripts": {
     "dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
@@ -19,7 +20,7 @@
     "productName": "TimeLogic Admin",
     "directories": { "output": "release" },
     "files": ["dist/**/*", "electron/**/*", "package.json"],
-    "linux": { "target": ["AppImage"], "category": "Office" },
+    "linux": { "target": ["AppImage"], "category": "Office", "maintainer": "TimeLogic <support@timelogic.app>" },
     "win": { "target": ["nsis"] },
     "mac": { "target": ["dmg"], "category": "public.app-category.business" }
   },
