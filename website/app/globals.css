@@ -1,0 +1,140 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────
+   TimeLogic design tokens (dark, navy, single blue accent)
+   ───────────────────────────────────────────────────────────── */
+@theme {
+  --color-ink: #060b18;          /* page base, near-black navy */
+  --color-base: #0a1226;         /* slightly raised base */
+  --color-surface: #0d1730;      /* card surface */
+  --color-surface-2: #111d3a;    /* raised card */
+
+  --color-brand: #2563eb;        /* primary blue */
+  --color-brand-strong: #1d4ed8; /* deep royal */
+  --color-brand-deep: #1e3a6e;   /* navy brand */
+  --color-sky: #60a5fa;          /* light accent */
+
+  --color-fg: #e9eefb;           /* primary text */
+  --color-muted: #9aabce;        /* secondary text */
+  --color-faint: #6b7ca3;        /* tertiary text */
+  --color-line: rgba(148, 173, 230, 0.12);
+  --color-line-strong: rgba(148, 173, 230, 0.22);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --radius-card: 20px;
+
+  --shadow-card: 0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+    0 20px 50px -20px rgba(2, 8, 23, 0.8);
+  --shadow-glow: 0 0 0 1px rgba(37, 99, 235, 0.3),
+    0 20px 60px -16px rgba(37, 99, 235, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(37, 99, 235, 0.35);
+  color: #fff;
+}
+
+/* Anchor offset so sticky header never covers section tops */
+section[id] {
+  scroll-margin-top: 96px;
+}
+
+/* ── Reusable surface treatments ───────────────────────────── */
+.glass {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.045),
+    rgba(255, 255, 255, 0.015)
+  );
+  border: 1px solid var(--color-line);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.card {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04),
+    rgba(255, 255, 255, 0.012)
+  );
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+}
+
+/* Hairline grid texture for premium depth */
+.grid-texture {
+  background-image: linear-gradient(rgba(148, 173, 230, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 173, 230, 0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%);
+}
+
+/* Soft radial brand glow utility */
+.glow-radial {
+  background: radial-gradient(
+    closest-side,
+    rgba(37, 99, 235, 0.5),
+    rgba(37, 99, 235, 0)
+  );
+}
+
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(180deg, #ffffff 10%, #9fb6ee 130%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-ink);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 173, 230, 0.18);
+  border-radius: 999px;
+}
+
+/* Focus visibility for keyboard users */
+:focus-visible {
+  outline: 2px solid var(--color-sky);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Honor reduced motion globally as a safety net */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
