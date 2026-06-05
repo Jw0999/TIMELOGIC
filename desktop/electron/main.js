@@ -10,7 +10,7 @@ function createWindow() {
     height: 820,
     minWidth: 1024,
     minHeight: 640,
-    title: 'Attendance — Admin',
+    title: 'TimeLogic — Admin',
     backgroundColor: '#EFF6FF',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
