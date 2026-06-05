@@ -58,6 +58,16 @@ aside .rounded-xl,
 aside .rounded-2xl,
 aside .rounded-full { box-shadow: none !important; }
 
+/* ── Responsive tables ───────────────────────────────────────────
+   Let wide data tables scroll horizontally on small screens instead
+   of overflowing the page (GitHub-style). Capped at the container. */
+main table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 /* ── Scrollbar ───────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }

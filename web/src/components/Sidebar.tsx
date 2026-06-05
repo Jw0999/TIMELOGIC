@@ -22,10 +22,11 @@ const GENERAL_NAV: { to: string; icon: LucideIcon; label: string }[] = [
   { to: '/settings', icon: Settings, label: 'Settings' },
 ];
 
-function NavItem({ to, icon: Icon, label, badge }: { to: string; icon: LucideIcon; label: string; badge?: string }) {
+function NavItem({ to, icon: Icon, label, badge, onClick }: { to: string; icon: LucideIcon; label: string; badge?: string; onClick?: () => void }) {
   return (
     <NavLink
       to={to}
+      onClick={onClick}
       className={({ isActive }) =>
         `relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group ${
           isActive
@@ -52,12 +53,14 @@ function NavItem({ to, icon: Icon, label, badge }: { to: string; icon: LucideIco
   );
 }
 
-export default function Sidebar() {
+export default function Sidebar({ open = false, onClose }: { open?: boolean; onClose?: () => void }) {
   const { logout } = useAuth();
   const navigate   = useNavigate();
 
   return (
-    <aside className="w-[230px] flex flex-col flex-shrink-0 bg-[var(--sidebar-bg)] border-r border-[var(--border)] h-screen overflow-hidden">
+    <aside
+      className={`fixed lg:static inset-y-0 left-0 z-50 w-[230px] flex flex-col flex-shrink-0 bg-[var(--sidebar-bg)] border-r border-[var(--border)] h-screen overflow-hidden transform transition-transform duration-200 lg:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}
+    >
       {/* Logo */}
       <div className="px-5 py-5 border-b border-[var(--border)] flex-shrink-0">
         <div className="flex items-center gap-2.5">
@@ -78,7 +81,7 @@ export default function Sidebar() {
           <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-3 mb-2">Menu</p>
           <nav className="space-y-0.5">
             {MENU_NAV.map((item) => (
-              <NavItem key={item.to} {...item} />
+              <NavItem key={item.to} {...item} onClick={onClose} />
             ))}
           </nav>
         </div>
@@ -88,10 +91,10 @@ export default function Sidebar() {
           <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-3 mb-2">General</p>
           <nav className="space-y-0.5">
             {GENERAL_NAV.map((item) => (
-              <NavItem key={item.to} {...item} />
+              <NavItem key={item.to} {...item} onClick={onClose} />
             ))}
             <button
-              onClick={() => { logout(); navigate('/login'); }}
+              onClick={() => { logout(); navigate('/login'); onClose?.(); }}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[var(--text-muted)] hover:bg-red-50 hover:text-red-600 transition-all"
             >
               <LogOut size={17} strokeWidth={1.8} />
@@ -103,7 +106,7 @@ export default function Sidebar() {
 
       {/* Bottom promo card */}
       <div className="px-3 pb-4 flex-shrink-0">
-        <div className="rounded-2xl p-4 text-white relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0f3d22 0%, #15803d 100%)' }}>
+        <div className="rounded-2xl p-4 text-white relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0f2d6e 0%, #1d4ed8 100%)' }}>
           {/* Background decoration */}
           <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/5" />
           <div className="absolute -bottom-6 -left-4 w-24 h-24 rounded-full bg-white/5" />

@@ -27,9 +27,9 @@ export default function Header({ action }: Props) {
   }, []);
 
   return (
-    <div className="flex items-center gap-4 px-6 py-3.5 bg-[var(--card-bg)] border-b border-[var(--border)] flex-shrink-0">
+    <div className="flex items-center gap-2 sm:gap-4 px-3 sm:px-6 py-3 sm:py-3.5 bg-[var(--card-bg)] border-b border-[var(--border)] flex-shrink-0">
       {/* Search — grows to fill center */}
-      <div className="flex-1 max-w-sm">
+      <div className="flex-1 min-w-0 max-w-sm">
         <div className="relative">
           <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
           <input
