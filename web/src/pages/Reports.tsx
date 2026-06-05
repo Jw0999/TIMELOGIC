@@ -65,17 +65,17 @@ export default function Reports() {
             </button>
             <button onClick={load} className="p-2 rounded-xl border border-[var(--border)] hover:bg-[var(--hover-bg)] text-[var(--text-muted)] transition"><RefreshCw size={15} /></button>
             <button onClick={() => download('excel')} disabled={downloading === 'excel'}
-              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition disabled:opacity-60">
-              {downloading === 'excel' ? <RefreshCw size={14} className="animate-spin" /> : <FileSpreadsheet size={14} />} Excel
+              className="flex-shrink-0 flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-3 sm:px-4 py-2 rounded-xl transition disabled:opacity-60">
+              {downloading === 'excel' ? <RefreshCw size={14} className="animate-spin" /> : <FileSpreadsheet size={14} />} <span className="hidden sm:inline">Excel</span>
             </button>
             <button onClick={() => download('csv')} disabled={downloading === 'csv'}
-              className="flex items-center gap-2 bg-slate-700 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2 rounded-xl transition disabled:opacity-60">
-              {downloading === 'csv' ? <RefreshCw size={14} className="animate-spin" /> : <FileText size={14} />} CSV
+              className="flex-shrink-0 flex items-center gap-2 bg-slate-700 hover:bg-slate-800 text-white text-sm font-semibold px-3 sm:px-4 py-2 rounded-xl transition disabled:opacity-60">
+              {downloading === 'csv' ? <RefreshCw size={14} className="animate-spin" /> : <FileText size={14} />} <span className="hidden sm:inline">CSV</span>
             </button>
           </div>
         }
       />
-      <div className="flex-1 overflow-y-auto p-6 space-y-5">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
 
         {loading ? <Spinner /> : sysReport ? (
           <>

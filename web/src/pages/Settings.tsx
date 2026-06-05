@@ -32,12 +32,12 @@ function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) =>
 
 function Row({ label, sub, children }: { label: string; sub?: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between py-3 border-b border-[var(--border)] last:border-0">
-      <div>
+    <div className="flex items-center justify-between gap-3 py-3 border-b border-[var(--border)] last:border-0">
+      <div className="min-w-0">
         <p className="text-sm font-semibold text-[var(--text-main)]">{label}</p>
         {sub && <p className="text-xs text-[var(--text-muted)] mt-0.5">{sub}</p>}
       </div>
-      <div className="ml-4 flex-shrink-0">{children}</div>
+      <div className="flex-shrink-0">{children}</div>
     </div>
   );
 }
@@ -128,15 +128,15 @@ export default function Settings() {
       <Header />
       <div className="flex-1 overflow-y-auto px-6 py-5">
         {/* Page heading */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+          <div className="min-w-0">
             <h1 className="text-2xl font-black text-[var(--text-main)]">Settings</h1>
             <p className="text-sm text-[var(--text-muted)] mt-0.5">Manage your platform preferences and configurations.</p>
           </div>
           <button
             onClick={handleSave}
             disabled={saving}
-            className={`flex items-center gap-2 text-sm font-bold px-5 py-2.5 rounded-xl transition-all shadow-sm disabled:opacity-60 ${
+            className={`flex items-center justify-center gap-2 text-sm font-bold px-5 py-2.5 rounded-xl transition-all shadow-sm disabled:opacity-60 w-full sm:w-auto flex-shrink-0 ${
               saved ? 'bg-emerald-500 text-white' : 'bg-primary-700 hover:bg-primary-800 text-white shadow-primary-200/30'
             }`}
           >
@@ -152,9 +152,9 @@ export default function Settings() {
               <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-md flex-shrink-0">
                 <Crown size={22} className="text-white" />
               </div>
-              <div>
-                <p className="font-bold text-[var(--text-main)]">{user?.firstName} {user?.lastName}</p>
-                <p className="text-sm text-[var(--text-muted)]">{user?.email}</p>
+              <div className="min-w-0">
+                <p className="font-bold text-[var(--text-main)] truncate">{user?.firstName} {user?.lastName}</p>
+                <p className="text-sm text-[var(--text-muted)] truncate">{user?.email}</p>
                 <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 mt-1 inline-block">Super Admin</span>
               </div>
             </div>
@@ -234,19 +234,19 @@ export default function Settings() {
 
           {/* Platform */}
           {/* Danger Zone */}
-          <div className="col-span-2">
+          <div className="sm:col-span-2">
             <div className="bg-[var(--card-bg)] rounded-2xl border-2 border-red-200 dark:border-red-900/50 p-6">
               <div className="flex items-center gap-2.5 mb-2">
-                <div className="w-8 h-8 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center"><AlertTriangle size={16} className="text-red-600" /></div>
+                <div className="w-8 h-8 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0"><AlertTriangle size={16} className="text-red-600" /></div>
                 <h3 className="font-bold text-[15px] text-red-600">Danger Zone</h3>
               </div>
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="min-w-0">
                   <p className="text-sm font-semibold text-[var(--text-main)]">Reset All Data</p>
-                  <p className="text-xs text-[var(--text-muted)] mt-0.5 max-w-md">Permanently delete <b>every</b> organization, admin, employee, session, attendance record, report and alert. Only your Super Admin login is kept. This cannot be undone.</p>
+                  <p className="text-xs text-[var(--text-muted)] mt-0.5 sm:max-w-md">Permanently delete <b>every</b> organization, admin, employee, session, attendance record, report and alert. Only your Super Admin login is kept. This cannot be undone.</p>
                 </div>
                 <button onClick={() => { setResetText(''); setShowReset(true); }}
-                  className="flex-shrink-0 flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-colors">
+                  className="flex-shrink-0 w-full sm:w-auto flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-colors">
                   <Trash2 size={15} /> Reset Everything
                 </button>
               </div>

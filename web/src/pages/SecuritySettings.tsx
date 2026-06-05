@@ -51,7 +51,7 @@ export default function SecuritySettings() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <Header title="Security Settings" subtitle="Live office security policies" />
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border)] shadow-sm p-5 mb-5 transition-colors">
           <h3 className="font-bold text-[var(--text-main)] mb-3 flex items-center gap-2"><MapPin size={16} className="text-primary-600" />Select Office</h3>
           {loadingOrgs ? <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary-600 border-t-transparent" />
@@ -146,9 +146,9 @@ export default function SecuritySettings() {
             </div>
 
             <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden transition-colors">
-              <div className="px-5 py-4 bg-primary-50 dark:bg-primary-900/20 border-b border-primary-100 dark:border-primary-800 flex items-center justify-between">
-                <div><h3 className="font-bold text-primary-900 dark:text-primary-300">{selectedOffice.name}</h3><p className="text-xs text-primary-600">{selectedOffice.orgName}</p></div>
-                <span className="text-xs text-emerald-600 font-semibold flex items-center gap-1"><div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />{detail.activeSessions} active</span>
+              <div className="px-5 py-4 bg-primary-50 dark:bg-primary-900/20 border-b border-primary-100 dark:border-primary-800 flex items-center justify-between gap-3">
+                <div className="min-w-0"><h3 className="font-bold text-primary-900 dark:text-primary-300 truncate">{selectedOffice.name}</h3><p className="text-xs text-primary-600 truncate">{selectedOffice.orgName}</p></div>
+                <span className="text-xs text-emerald-600 font-semibold flex items-center gap-1 flex-shrink-0 whitespace-nowrap"><div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />{detail.activeSessions} active</span>
               </div>
               <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>

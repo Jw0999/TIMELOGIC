@@ -29,7 +29,7 @@ export default function PageShell({
     <div className="flex flex-col h-full overflow-hidden bg-[var(--page-bg)]">
       <Header action={action} />
 
-      <div className="flex-1 flex flex-col overflow-hidden px-6 pt-4">
+      <div className="flex-1 flex flex-col overflow-hidden px-4 sm:px-6 pt-4">
         {/* Breadcrumb */}
         <div className="flex items-center gap-1.5 mb-2">
           {breadcrumb.map((b, i) => (
@@ -44,7 +44,7 @@ export default function PageShell({
         <h1 className="text-2xl font-black text-[var(--text-main)] mb-4">{title}</h1>
 
         {/* Tabs */}
-        <div className="flex items-center gap-0 border-b border-[var(--border)] mb-4">
+        <div className="flex items-center gap-0 border-b border-[var(--border)] mb-4 overflow-x-auto">
           {tabs.map((tab, i) => (
             <button
               key={tab.label}
@@ -67,7 +67,7 @@ export default function PageShell({
 
         {/* Search + export row */}
         <div className="flex items-center justify-between gap-3 mb-4">
-          <div className="relative w-64">
+          <div className="relative flex-1 sm:flex-none sm:w-64 min-w-0">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
             <input
               value={search}
@@ -78,7 +78,7 @@ export default function PageShell({
           </div>
           {onExport && (
             <button onClick={onExport}
-              className="flex items-center gap-2 border border-[var(--border)] bg-[var(--card-bg)] hover:bg-[var(--hover-bg)] text-sm font-semibold px-4 py-2 rounded-xl transition-colors text-[var(--text-main)]">
+              className="flex-shrink-0 whitespace-nowrap flex items-center gap-2 border border-[var(--border)] bg-[var(--card-bg)] hover:bg-[var(--hover-bg)] text-sm font-semibold px-4 py-2 rounded-xl transition-colors text-[var(--text-main)]">
               <Download size={14} />
               {exportLabel}
             </button>

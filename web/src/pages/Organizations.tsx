@@ -217,7 +217,7 @@ function EditOrgModal({ org, onClose, onSaved }: { org: any; onClose: () => void
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {error && <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-sm text-red-700">{error}</div>}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="col-span-2"><label className={lbl}>Organization Name</label><input className={inp} value={name} onChange={(e) => setName(e.target.value)}/></div>
+            <div className="sm:col-span-2"><label className={lbl}>Organization Name</label><input className={inp} value={name} onChange={(e) => setName(e.target.value)}/></div>
             <div><label className={lbl}>Plan</label><select className={inp} value={tier} onChange={(e) => setTier(e.target.value)}>{PLANS.map((p) => <option key={p} value={p}>{p[0].toUpperCase()+p.slice(1)}</option>)}</select></div>
           </div>
           <div><label className={lbl}>Industry</label><select className={inp} value={industry} onChange={(e) => setIndustry(e.target.value)}>{INDUSTRIES.map((i) => <option key={i}>{i}</option>)}</select></div>

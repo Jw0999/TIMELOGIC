@@ -28,8 +28,8 @@ export default function Header({ action }: Props) {
 
   return (
     <div className="flex items-center gap-2 sm:gap-4 px-3 sm:px-6 py-3 sm:py-3.5 bg-[var(--card-bg)] border-b border-[var(--border)] flex-shrink-0">
-      {/* Search — grows to fill center */}
-      <div className="flex-1 min-w-0 max-w-sm">
+      {/* Search — grows to fill center (hidden on small screens to free room) */}
+      <div className="hidden md:block flex-1 min-w-0 max-w-sm">
         <div className="relative">
           <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
           <input
@@ -45,12 +45,12 @@ export default function Header({ action }: Props) {
       </div>
 
       {/* Action slot (Add buttons etc.) */}
-      {action && <div className="flex items-center gap-2">{action}</div>}
+      {action && <div className="flex items-center gap-2 min-w-0">{action}</div>}
 
       {/* Right cluster */}
-      <div className="flex items-center gap-1.5 ml-auto">
-        {/* Mail */}
-        <button className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[var(--hover-bg)] text-[var(--text-muted)] transition-colors">
+      <div className="flex items-center gap-1.5 ml-auto flex-shrink-0">
+        {/* Mail (hidden on small screens) */}
+        <button className="w-9 h-9 hidden sm:flex items-center justify-center rounded-xl hover:bg-[var(--hover-bg)] text-[var(--text-muted)] transition-colors">
           <Mail size={17} />
         </button>
 
