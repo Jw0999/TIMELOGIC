@@ -14,6 +14,10 @@ jobs:
         include:
           - os: ubuntu-latest
             artifact: linux
+          - os: windows-latest
+            artifact: windows
+          - os: macos-latest
+            artifact: macos
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
