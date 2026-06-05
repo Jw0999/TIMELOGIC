@@ -14,7 +14,9 @@
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "TimeLogic needs your location to verify you are on the office WiFi network for check-in.",
         "NSLocationAlwaysUsageDescription": "TimeLogic needs your location to verify your office WiFi during attendance check-in.",
-        "UIBackgroundModes": ["fetch"]
+        "UIBackgroundModes": [
+          "fetch"
+        ]
       },
       "entitlements": {
         "com.apple.developer.networking.wifi-info": true
@@ -30,7 +32,8 @@
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_WIFI_STATE",
-        "android.permission.CHANGE_WIFI_STATE"
+        "android.permission.CHANGE_WIFI_STATE",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "plugins": [
@@ -49,6 +52,12 @@
       "expo-asset",
       "expo-font",
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "d6d5b887-5b49-40ef-be01-857fde124fa1"
+      }
+    },
+    "owner": "fishgfgu"
   }
 }
