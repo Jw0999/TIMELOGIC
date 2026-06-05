@@ -1,7 +1,8 @@
 {
   "name": "attendance-desktop",
   "version": "1.0.0",
-  "description": "Attendance System — Admin Desktop App",
+  "description": "TimeLogic — Admin Desktop App",
+  "author": "TimeLogic",
   "main": "electron/main.js",
   "scripts": {
     "dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
