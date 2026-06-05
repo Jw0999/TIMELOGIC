@@ -11,7 +11,7 @@
     "electron": "electron .",
     "preview": "vite preview",
     "dist": "vite build && electron-builder",
-    "dist:linux": "vite build && electron-builder --linux AppImage",
+    "dist:linux": "vite build && electron-builder --linux deb",
     "dist:win": "vite build && electron-builder --win nsis",
     "dist:mac": "vite build && electron-builder --mac dmg"
   },
@@ -20,7 +20,7 @@
     "productName": "TimeLogic Admin",
     "directories": { "output": "release" },
     "files": ["dist/**/*", "electron/**/*", "package.json"],
-    "linux": { "target": ["AppImage"], "category": "Office", "maintainer": "TimeLogic <support@timelogic.app>" },
+    "linux": { "target": ["deb"], "category": "Office", "maintainer": "TimeLogic <support@timelogic.app>" },
     "win": { "target": ["nsis"] },
     "mac": { "target": ["dmg"], "category": "public.app-category.business" }
   },
