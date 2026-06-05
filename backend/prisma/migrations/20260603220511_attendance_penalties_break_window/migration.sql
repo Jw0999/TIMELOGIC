@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE "offices" ADD COLUMN     "autoSessionMinutes" INTEGER NOT NULL DEFAULT 60,
+ADD COLUMN     "breakEnd" TEXT,
+ADD COLUMN     "breakStart" TEXT,
+ADD COLUMN     "graceMinutes" INTEGER NOT NULL DEFAULT 30,
+ADD COLUMN     "gracePenalty" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "lateAfterMinutes" INTEGER NOT NULL DEFAULT 90,
+ADD COLUMN     "latePenalty" INTEGER NOT NULL DEFAULT 0;

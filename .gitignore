@@ -1,0 +1,35 @@
+# Dependencies
+**/node_modules/
+
+# Environment & secrets (templates are kept below)
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.production.example
+
+# Build output
+**/dist/
+**/build/
+desktop/release/
+desktop/dist-electron/
+
+# Expo / React Native
+mobile/.expo/
+
+# Uploaded user data (face photos) — never commit
+backend/uploads/
+
+# Logs
+**/*.log
+npm-debug.log*
+yarn-error.log*
+
+# Editor / agent tooling
+.claude/
+.agents/
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

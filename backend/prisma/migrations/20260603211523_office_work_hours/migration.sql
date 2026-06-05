@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "offices" ADD COLUMN     "breakMinutes" INTEGER NOT NULL DEFAULT 60,
+ADD COLUMN     "closeTime" TEXT NOT NULL DEFAULT '17:00',
+ADD COLUMN     "openTime" TEXT NOT NULL DEFAULT '08:00';

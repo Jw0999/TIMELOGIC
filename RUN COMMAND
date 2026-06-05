@@ -1,0 +1,19 @@
+┌──(kelvin㉿kali)-[~/Documents/Attendance Syatem/backend]
+└─$ kill $(lsof -ti:5000) 2>/dev/null; sleep 1
+npm run dev
+
+sudo systemctl start redis-server
+sudo pg_ctlcluster 18 main start
+
+
+
+┌──(kelvin㉿kali)-[~/Documents/Attendance Syatem/desktop]
+└─$ npm run dev
+
+
+┌──(kelvin㉿kali)-[~/Documents/Attendance Syatem/web]
+└─$ npm run dev
+
+
+┌──(kelvin㉿kali)-[~/Documents/Attendance Syatem/mobile]
+└─$ npx expo start
