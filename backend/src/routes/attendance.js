@@ -30,6 +30,7 @@ router.post('/check-out', authenticate, [
   body('wifiSSID').optional({ nullable: true }).isString(),
 ], validate, ctrl.checkOut);
 
+router.get('/network', authenticate, ctrl.network);
 router.post('/heartbeat', authenticate, ctrl.heartbeat);
 
 router.get('/current-session', authenticate, ctrl.getCurrentSession);

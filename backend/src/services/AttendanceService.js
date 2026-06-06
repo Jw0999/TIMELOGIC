@@ -17,7 +17,7 @@ class AttendanceService {
       where: { id: sessionId },
       select: {
         id: true, status: true,
-        office: { select: { id: true, wifiSSID: true, securitySettings: true } },
+        office: { select: { id: true, wifiSSID: true, publicIp: true, securitySettings: true } },
       },
     });
     if (!session || session.status !== 'ACTIVE') {
@@ -49,6 +49,28 @@ class AttendanceService {
     const wifiRequired = settings.wifiRequired !== false; // default on
     if (!wifiRequired) return { ok: true, verified: false };
 
+    // ── Web / PWA (iOS): browsers can't read the Wi-Fi SSID, so verify the office
+    //    NETWORK by source IP. Employees on the office Wi-Fi share its public IP. ──
+    if (ctx.platform === 'web') {
+      const expectedIp = (office?.publicIp || '').trim();
+      if (!expectedIp) {
+        return {
+          ok: false, reason: 'NETWORK_NOT_CONFIGURED',
+          message: 'Web check-in is not set up for your office yet. Ask your admin to set the office network IP in Security Settings.',
+        };
+      }
+      const gotIp = (ctx.ip || '').trim();
+      if (!gotIp) {
+        return { ok: false, reason: 'NETWORK_REQUIRED', message: 'Could not detect your network. Connect to the office Wi-Fi and try again.' };
+      }
+      if (gotIp !== expectedIp) {
+        logger.warn(`Network mismatch: employee ${employeeId} from "${gotIp}" expected "${expectedIp}"`);
+        return { ok: false, reason: 'NETWORK_MISMATCH', message: 'You must be on the company network (office Wi-Fi) to check in.' };
+      }
+      return { ok: true, verified: true };
+    }
+
+    // ── Native app (Android): SSID check ──
     const expected = (office?.wifiSSID || '').trim();
     // Wi-Fi is required but the org hasn't set its SSID yet → we cannot verify, so
     // we must NOT let anyone through. Admin has to set it in Security Settings.
@@ -182,7 +204,7 @@ class AttendanceService {
         id: true, status: true, startTime: true, endTime: true,
         office: {
           select: {
-            id: true, name: true, wifiSSID: true, openTime: true,
+            id: true, name: true, wifiSSID: true, publicIp: true, openTime: true,
             graceMinutes: true, lateAfterMinutes: true, gracePenalty: true, latePenalty: true,
             securitySettings: true,
           },
@@ -268,7 +290,7 @@ class AttendanceService {
             id: true,
             office: {
               select: {
-                id: true, name: true, wifiSSID: true,
+                id: true, name: true, wifiSSID: true, publicIp: true,
                 securitySettings: true,
               },
             },

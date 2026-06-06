@@ -138,7 +138,8 @@ model Office {
   orgId        String
   name         String
   address      String?
-  wifiSSID     String?                 // approved company Wi-Fi network name
+  wifiSSID     String?                 // approved company Wi-Fi name (native app SSID check)
+  publicIp     String?                 // office public IP (web/PWA "same network" check)
   openTime     String  @default("08:00")  // work day start / check-in opens (HH:MM)
   closeTime    String  @default("17:00")  // work day end / session auto-closes (HH:MM)
   // ── Attendance grace + penalties (set per organization) ──

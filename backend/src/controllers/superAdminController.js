@@ -13,7 +13,7 @@ const listOrgs = async (req, res, next) => {
         offices: {
           select: {
             id: true, name: true, address: true, timezone: true, isActive: true,
-            wifiSSID: true, openTime: true, closeTime: true, breakMinutes: true,
+            wifiSSID: true, publicIp: true, openTime: true, closeTime: true, breakMinutes: true,
             graceMinutes: true, lateAfterMinutes: true, gracePenalty: true, latePenalty: true,
             autoSessionMinutes: true, breakStart: true, breakEnd: true,
             securitySettings: { select: { id: true } },
@@ -310,6 +310,7 @@ const updateOfficeSecurity = async (req, res, next) => {
     const b = req.body;
     const officeData = {};
     if (b.wifiSSID  !== undefined) officeData.wifiSSID  = (b.wifiSSID && b.wifiSSID.trim()) ? b.wifiSSID.trim() : null;
+    if (b.publicIp  !== undefined) officeData.publicIp  = (b.publicIp && b.publicIp.trim()) ? b.publicIp.trim() : null;
     if (b.openTime  !== undefined) officeData.openTime  = b.openTime || '08:00';
     if (b.closeTime !== undefined) officeData.closeTime = b.closeTime || '17:00';
     if (b.breakMinutes !== undefined) officeData.breakMinutes = Number.isFinite(+b.breakMinutes) ? parseInt(b.breakMinutes, 10) : 60;
@@ -327,7 +328,7 @@ const updateOfficeSecurity = async (req, res, next) => {
     // SecuritySettings fields (strip non-column keys)
     const {
       id, officeId: _o, createdAt, updatedAt, updatedBy: _u,
-      wifiSSID: _w, openTime: _ot, closeTime: _ct, breakMinutes: _bm,
+      wifiSSID: _w, publicIp: _pi, openTime: _ot, closeTime: _ct, breakMinutes: _bm,
       graceMinutes: _g, lateAfterMinutes: _la, gracePenalty: _gp, latePenalty: _lp,
       autoSessionMinutes: _as, breakStart: _bs, breakEnd: _be,
       ...settingsData

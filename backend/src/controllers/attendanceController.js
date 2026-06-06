@@ -48,17 +48,26 @@ const REASON_MESSAGES = {
   WIFI_REQUIRED:      'Connect to the company Wi-Fi to mark attendance.',
   WIFI_MISMATCH:      'You must be connected to the company Wi-Fi to mark attendance.',
   WIFI_NOT_CONFIGURED:'Your office Wi-Fi has not been set up yet. Contact your administrator.',
+  NETWORK_NOT_CONFIGURED: 'Web check-in is not set up for your office yet. Contact your administrator.',
+  NETWORK_REQUIRED:   'Could not detect your network. Connect to the office Wi-Fi and try again.',
+  NETWORK_MISMATCH:   'You must be on the company network (office Wi-Fi) to check in.',
   CHALLENGE_REQUIRED: 'A verification code is required to check in.',
   CHALLENGE_EXPIRED:  'Your check-in code expired. Tap Check In again.',
   CHALLENGE_FAILED:   'The verification code is incorrect.',
   CHECKIN_CLOSED:     'Check-in window has closed for today.',
 };
 
-// POST /api/attendance/check-in/challenge — validate Wi-Fi, then issue a one-time code
+// GET /api/attendance/network — returns the caller's public IP (for office-IP setup
+// and for the web/PWA client to show which network it is on)
+const network = async (req, res) => {
+  res.json({ success: true, data: { ip: req.ip } });
+};
+
+// POST /api/attendance/check-in/challenge — validate network, then issue a one-time code
 const issueChallenge = async (req, res, next) => {
   try {
-    const { sessionId, wifiSSID, deviceId } = req.body;
-    const result = await AttendanceService.issueChallenge(req.user.id, sessionId, { wifiSSID, deviceId });
+    const { sessionId, wifiSSID, deviceId, platform } = req.body;
+    const result = await AttendanceService.issueChallenge(req.user.id, sessionId, { wifiSSID, deviceId, platform, ip: req.ip });
     if (!result.success) {
       const msg = result.message ?? REASON_MESSAGES[result.reason] ?? 'Could not start check-in.';
       return res.status(400).json({ success: false, message: msg, reason: result.reason });
@@ -69,7 +78,7 @@ const issueChallenge = async (req, res, next) => {
 
 const checkIn = async (req, res, next) => {
   try {
-    const result = await AttendanceService.checkIn(req.user.id, req.body);
+    const result = await AttendanceService.checkIn(req.user.id, { ...req.body, ip: req.ip });
     if (!result.success) {
       const msg = result.message ?? REASON_MESSAGES[result.reason] ?? `Check-in failed: ${result.reason}`;
       return res.status(400).json({ success: false, message: msg, reason: result.reason });
@@ -80,8 +89,8 @@ const checkIn = async (req, res, next) => {
 
 const checkOut = async (req, res, next) => {
   try {
-    const { sessionId, deviceId, wifiSSID, latitude, longitude } = req.body;
-    const record = await AttendanceService.checkOut(req.user.id, sessionId, { deviceId, wifiSSID, latitude, longitude });
+    const { sessionId, deviceId, wifiSSID, latitude, longitude, platform } = req.body;
+    const record = await AttendanceService.checkOut(req.user.id, sessionId, { deviceId, wifiSSID, latitude, longitude, platform, ip: req.ip });
     res.json({ success: true, data: record });
   } catch (err) { next(err); }
 };
@@ -179,4 +188,4 @@ const getFlagged = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-module.exports = { issueChallenge, checkIn, checkOut, heartbeat, getStatus, getHistory, flagRecord, approveRecord, getFlagged, getCurrentSession };
+module.exports = { network, issueChallenge, checkIn, checkOut, heartbeat, getStatus, getHistory, flagRecord, approveRecord, getFlagged, getCurrentSession };

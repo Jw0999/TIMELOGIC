@@ -35,6 +35,7 @@ export default function SecuritySettings() {
       setSettings({
         ...(res.data.settings ?? {}),
         wifiSSID:  off.wifiSSID  ?? '',
+        publicIp:  off.publicIp  ?? '',
         openTime:  off.openTime  ?? '08:00',
         closeTime: off.closeTime ?? '17:00',
         breakMinutes: off.breakMinutes ?? 60,
@@ -115,7 +116,16 @@ export default function SecuritySettings() {
                 <input type="text" value={settings.wifiSSID ?? ''} onChange={(e) => update('wifiSSID', e.target.value)}
                   placeholder="e.g. MyOffice_WiFi"
                   className="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--text-main)] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
-                <p className="text-[11px] text-[var(--text-muted)] mt-1">Employees must be connected to this exact network name to check in. The one-time code challenge is always enforced to block automated check-ins.</p>
+                <p className="text-[11px] text-[var(--text-muted)] mt-1">Android app: employees must be on this exact network name to check in. The one-time code challenge always applies.</p>
+              </div>
+
+              {/* Office Public IP — for iOS / web PWA check-in */}
+              <div className="mb-2">
+                <label className="flex items-center gap-1.5 text-sm font-semibold text-[var(--text-main)] mb-1.5"><Wifi size={13} className="text-[var(--text-muted)]" />Office Public IP (iOS / Web app)</label>
+                <input type="text" value={settings.publicIp ?? ''} onChange={(e) => update('publicIp', e.target.value)}
+                  placeholder="e.g. 102.89.34.12"
+                  className="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--text-main)] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                <p className="text-[11px] text-[var(--text-muted)] mt-1">Browsers cannot read Wi-Fi names, so iOS / web (PWA) check-ins are verified by your office internet IP. Open the office Wi-Fi and visit whatismyip.com to find it. Leave blank to disable web check-in.</p>
               </div>
 
               {/* Work hours + break */}
