@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Search, UserPlus, Smartphone, X, Eye, Camera } from 'lucide-react';
 import Header from '../components/Header';
-import { fetchEmployees, createEmployee, suspendUser, activateUser, deleteEmployee, fetchDepartments, fetchPlanInfo } from '../services';
+import { fetchEmployees, createEmployee, suspendUser, activateUser, deleteEmployee, resetDevice, fetchDepartments, fetchPlanInfo } from '../services';
 import { API_URL, SOCKET_URL } from '../config';
 import { getToken } from '../services/api';
 
@@ -339,6 +339,12 @@ export default function Employees() {
                             <button onClick={async () => { e.status === 'ACTIVE' ? await suspendUser(e.id) : await activateUser(e.id); load(); }}
                               className={`text-xs font-semibold px-2 py-1 rounded-lg transition ${e.status === 'ACTIVE' ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 hover:bg-amber-100' : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 hover:bg-emerald-100'}`}>
                               {e.status === 'ACTIVE' ? 'Suspend' : 'Activate'}
+                            </button>
+                            <button onClick={async () => {
+                              if (!window.confirm(`Reset device for ${e.firstName} ${e.lastName}?\n\nThis unlinks their current phone. The NEXT device they sign in on becomes their bound device, and the old one will stop working. Use this when an employee gets a new phone.`)) return;
+                              try { await resetDevice(e.id); alert('Device unlinked. The employee can now sign in on their new phone.'); } catch (err: any) { alert(err?.message ?? 'Could not reset device.'); }
+                            }} className="p-1.5 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/20 text-primary-600 transition" title="Reset device (allow login on a new phone)">
+                              <Smartphone size={14} />
                             </button>
                             <button onClick={async () => {
                               if (!window.confirm(`Terminate ${e.firstName} ${e.lastName}?\n\nThey will be marked as SACKED and can no longer log in.\nAll their records (attendance, leaves, breaks) are preserved and visible only to Super Admin.`)) return;

@@ -125,7 +125,7 @@ export default function SecuritySettings() {
                 <input type="text" value={settings.publicIp ?? ''} onChange={(e) => update('publicIp', e.target.value)}
                   placeholder="e.g. 102.89.34.12"
                   className="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--text-main)] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
-                <p className="text-[11px] text-[var(--text-muted)] mt-1">Browsers cannot read Wi-Fi names, so iOS / web (PWA) check-ins are verified by your office internet IP. Open the office Wi-Fi and visit whatismyip.com to find it. Leave blank to disable web check-in.</p>
+                <p className="text-[11px] text-[var(--text-muted)] mt-1">Verifies iOS / web (PWA) check-ins. Auto-detected and kept current from Android employees' Wi-Fi-verified check-ins, so this usually fills itself in. Set manually only if this office has no Android users.</p>
               </div>
 
               {/* Work hours + break */}

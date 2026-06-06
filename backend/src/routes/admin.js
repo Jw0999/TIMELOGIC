@@ -59,6 +59,7 @@ router.post('/departments', authenticate, isAdmin, [
 router.get('/users', authenticate, isAdmin, ctrl.listUsers);
 router.put('/users/:userId', authenticate, isAdmin, ctrl.updateUser);
 router.put('/users/:userId/suspend', authenticate, isAdmin, ctrl.suspendUser);
+router.post('/users/:userId/reset-device', authenticate, isAdmin, ctrl.resetDevice);
 router.delete('/users/:userId', authenticate, isAdmin, ctrl.deleteEmployee);
 
 // ─── Face photo upload ──────────────────────────────────────────────────────

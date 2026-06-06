@@ -27,6 +27,7 @@ export const createEmployee   = (body: any) => api.post<any>('/admin/employees',
 export const suspendUser      = (id: string) => api.put<any>(`/admin/users/${id}/suspend`, {});
 export const activateUser     = (id: string) => api.put<any>(`/admin/users/${id}`, { status: 'ACTIVE' });
 export const deleteEmployee   = (id: string) => api.delete<any>(`/admin/users/${id}`);
+export const resetDevice      = (id: string) => api.post<any>(`/admin/users/${id}/reset-device`, {}).then((r) => r.data);
 export const fetchDepartments = () => api.get<any>('/admin/org').then((r) => (r.data?.departments ?? []));
 
 // ─── Leaves ──────────────────────────────────────────────────────────────────

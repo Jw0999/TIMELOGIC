@@ -337,11 +337,35 @@ const deleteEmployee = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+// POST /api/admin/users/:userId/reset-device
+// Frees an employee's device binding so they can sign in on a NEW phone. The
+// first device used after this becomes their bound device; the old one is
+// rejected (it no longer matches the active binding).
+const resetDevice = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    // Tenant isolation: admins can only reset employees in their own org.
+    const where = req.user.role === 'SUPER_ADMIN' ? { id: userId } : { id: userId, orgId: req.user.orgId };
+    const emp = await prisma.user.findFirst({ where, select: { id: true } });
+    if (!emp) return res.status(404).json({ success: false, message: 'Employee not found' });
+
+    const result = await prisma.registeredDevice.updateMany({
+      where: { employeeId: userId, isActive: true },
+      data: { isActive: false },
+    });
+    res.json({
+      success: true,
+      cleared: result.count,
+      message: 'Device unlinked. The employee can now sign in on a new device, which becomes their bound device. The old device will no longer work.',
+    });
+  } catch (err) { next(err); }
+};
+
 module.exports = {
   getOrg, updateOrg,
   createOffice,
   createDepartment,
-  listUsers, updateUser, suspendUser, deleteEmployee,
+  listUsers, updateUser, suspendUser, deleteEmployee, resetDevice,
   getSecuritySettings, updateSecuritySettings,
   setBreakPolicy,
   emergencyStopAll, emergencyLockSystem, emergencyInvalidateQR, emergencyRevert,

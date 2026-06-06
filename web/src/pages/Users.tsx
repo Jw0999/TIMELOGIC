@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { X, Crown, Shield, User, ChevronsUpDown, Calendar, Coffee, AlertTriangle, FileText, ArrowLeftRight } from 'lucide-react';
+import { X, Crown, Shield, User, ChevronsUpDown, Calendar, Coffee, AlertTriangle, FileText, ArrowLeftRight, Smartphone } from 'lucide-react';
 import PageShell from '../components/PageShell';
-import { fetchAllOrgs, fetchOrgUsers, fetchEmployeeRecords, reemployEmployee, suspendAdmin, activateAdmin, reassignEmployee } from '../services';
+import { fetchAllOrgs, fetchOrgUsers, fetchEmployeeRecords, reemployEmployee, suspendAdmin, activateAdmin, reassignEmployee, resetUserDevice } from '../services';
 import { downloadCSV } from '../utils/csv';
 
 const AVATAR_COLORS = ['#15803d','#0891b2','#7c3aed','#b45309','#be185d','#0369a1','#dc2626','#d97706'];
@@ -230,11 +230,21 @@ export default function Users() {
                         </button>
                       )}
                       {u.role === 'EMPLOYEE' && !isTerminated && (
-                        <button
-                          onClick={() => setReassign(u)}
-                          className="flex items-center gap-1.5 text-sm font-semibold text-primary-700 hover:text-primary-900 transition-colors">
-                          <ArrowLeftRight size={13}/> Reassign
-                        </button>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => setReassign(u)}
+                            className="flex items-center gap-1.5 text-sm font-semibold text-primary-700 hover:text-primary-900 transition-colors">
+                            <ArrowLeftRight size={13}/> Reassign
+                          </button>
+                          <button
+                            onClick={async () => {
+                              if (!window.confirm(`Reset device for ${u.firstName} ${u.lastName}?\n\nUnlinks their current phone so they can sign in on a new one. The next device used becomes their bound device; the old one stops working.`)) return;
+                              try { await resetUserDevice(u.id); alert('Device unlinked. They can now sign in on a new phone.'); } catch (err: any) { alert(err?.message ?? 'Could not reset device.'); }
+                            }}
+                            className="flex items-center gap-1.5 text-sm font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors">
+                            <Smartphone size={13}/> Reset device
+                          </button>
+                        </div>
                       )}
                       {u.role === 'SUPER_ADMIN' && <span className="text-xs text-[var(--text-muted)] italic">—</span>}
                       {isTerminated && u.role !== 'ADMIN' && <span className="text-xs text-[var(--text-muted)] italic">Click row →</span>}

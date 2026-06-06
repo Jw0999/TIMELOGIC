@@ -100,6 +100,26 @@ class AttendanceService {
     return { ok: true, verified: true };
   }
 
+  // Auto-learn the office public IP from a Wi-Fi-VERIFIED native check-in.
+  // Only trusts a check-in whose SSID matched the office network, so the IP is
+  // genuinely the office's. Keeps office.publicIp current for iOS/web (PWA)
+  // employees with zero manual setup, across unlimited organizations.
+  async _learnOfficeIp(office, ctx) {
+    if (!office || ctx.platform === 'web') return;            // never learn from web
+    const ssid = (office.wifiSSID || '').trim();
+    const got  = (ctx.wifiSSID || '').trim();
+    const ip   = (ctx.ip || '').trim();
+    if (!ssid || !ip) return;                                  // need a verified SSID + an IP
+    if (got.toLowerCase() !== ssid.toLowerCase()) return;      // not actually on the office Wi-Fi
+    if (office.publicIp === ip) return;                        // already current
+    try {
+      await prisma.office.update({ where: { id: office.id }, data: { publicIp: ip } });
+      logger.info(`Auto-learned office IP for office ${office.id}: ${ip}`);
+    } catch (err) {
+      logger.warn('Could not auto-learn office IP:', err.message);
+    }
+  }
+
   // ── ADMIN ATTENDANCE (anti-cheat) ───────────────────────────────────────────
   // An admin must be present (logged in / app open) by openTime - AUTO_CREATE_LEAD,
   // the same instant the scheduler auto-opens the session. We record the FIRST
@@ -195,7 +215,7 @@ class AttendanceService {
 
   // ── CHECK IN ────────────────────────────────────────────────────────────────
   async checkIn(employeeId, scanData) {
-    const { sessionId, deviceId, wifiSSID, challengeCode, platform, model } = scanData;
+    const { sessionId, deviceId, wifiSSID, challengeCode, platform, model, ip } = scanData;
 
     // Load session + office + security settings in one query
     const session = await prisma.attendanceSession.findUnique({
@@ -240,8 +260,8 @@ class AttendanceService {
       return { success: false, reason: challenge.reason, message: challenge.message };
     }
 
-    // ── Verification pipeline (device binding → wifi) ──
-    const ctx = { deviceId, wifiSSID, platform, model };
+    // ── Verification pipeline (device binding → network) ──
+    const ctx = { deviceId, wifiSSID, platform, model, ip };
     const check = await this._verifyContext({
       employeeId,
       office: session.office,
@@ -251,6 +271,12 @@ class AttendanceService {
     if (!check.ok) {
       return { success: false, reason: check.reason, message: check.message };
     }
+
+    // ── Auto-learn the office public IP from a VERIFIED Android check-in ──
+    // The SSID check proves this device is on the office Wi-Fi, so its public IP
+    // IS the office's. We store it so iOS/web (PWA) employees on the same Wi-Fi
+    // can be verified by IP. Self-healing: tracks dynamic IP changes daily.
+    await this._learnOfficeIp(session.office, ctx);
 
     // ── Attendance rules: status + penalty ──
     const clockInTime = new Date();

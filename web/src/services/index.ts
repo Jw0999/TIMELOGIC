@@ -23,6 +23,7 @@ export const activateUser     = (id: string) => api.put<any>(`/admin/users/${id}
 export const suspendAdmin     = (id: string) => api.put<any>(`/super/users/${id}/suspend`, {});
 export const activateAdmin    = (id: string) => api.put<any>(`/super/users/${id}/activate`, {});
 export const reassignEmployee = (id: string, orgId: string) => api.put<any>(`/super/users/${id}/reassign`, { orgId });
+export const resetUserDevice  = (id: string) => api.post<any>(`/admin/users/${id}/reset-device`, {});
 export const updateProfile    = (body: { firstName?: string; lastName?: string; email?: string }) => api.put<any>('/super/profile', body).then((r) => r.data);
 export const changePassword   = (currentPassword: string, newPassword: string) => api.put<any>('/auth/change-password', { currentPassword, newPassword });
 export const resetSystem      = () => api.post<any>('/super/reset', { confirm: 'RESET' });

@@ -117,7 +117,7 @@ function OrgModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
               </div>
 
               <div><label className={lbl}>Company WiFi (SSID) — Android app</label><input className={inp} value={o.wifiSSID} onChange={(e) => updateOffice(i,'wifiSSID',e.target.value)} placeholder="e.g. Acme_Office_5G"/><p className="text-[11px] text-[var(--text-muted)] mt-1">Android employees must be on this exact network to check in.</p></div>
-              <div><label className={lbl}>Office Public IP — iOS / Web (PWA) app</label><input className={inp} value={o.publicIp} onChange={(e) => updateOffice(i,'publicIp',e.target.value)} placeholder="e.g. 102.89.34.12"/><p className="text-[11px] text-[var(--text-muted)] mt-1">Browsers can't read Wi-Fi names, so iOS/web check-ins verify this office's internet IP. On the office Wi-Fi, open whatismyip.com to find it. Leave blank to disable web check-in.</p></div>
+              <div><label className={lbl}>Office Public IP — iOS / Web (PWA) app</label><input className={inp} value={o.publicIp} onChange={(e) => updateOffice(i,'publicIp',e.target.value)} placeholder="e.g. 102.89.34.12"/><p className="text-[11px] text-[var(--text-muted)] mt-1">Verifies iOS/web (PWA) check-ins. The backend auto-detects and keeps this updated from your Android employees' Wi-Fi-verified check-ins, so you can usually leave it blank. Set it manually only if this office has no Android users.</p></div>
             </div>))}
           </div>}
           {step === 3 && <div>
