@@ -89,8 +89,8 @@ const checkIn = async (req, res, next) => {
 
 const checkOut = async (req, res, next) => {
   try {
-    const { sessionId, deviceId, wifiSSID, latitude, longitude, platform } = req.body;
-    const record = await AttendanceService.checkOut(req.user.id, sessionId, { deviceId, wifiSSID, latitude, longitude, platform, ip: req.ip });
+    const { sessionId, deviceId, wifiSSID, platform } = req.body;
+    const record = await AttendanceService.checkOut(req.user.id, sessionId, { deviceId, wifiSSID, platform, ip: req.ip });
     res.json({ success: true, data: record });
   } catch (err) { next(err); }
 };

@@ -18,7 +18,7 @@ const ORG_COLORS = ['#15803d','#0891b2','#7c3aed','#b45309','#be185d','#0369a1']
 interface OrgFormData {
   name: string; industry: string; subscriptionTier: string;
   offices: {
-    name: string; address: string; timezone: string; wifiSSID: string;
+    name: string; address: string; timezone: string; wifiSSID: string; publicIp: string;
     openTime: string; closeTime: string; breakMinutes: number;
     graceMinutes: number; lateAfterMinutes: number; gracePenalty: number; latePenalty: number;
     breakStart: string; breakEnd: string;
@@ -27,7 +27,7 @@ interface OrgFormData {
   admin: { firstName: string; lastName: string; email: string; password: string; confirmPassword: string; employeeCode: string };
 }
 const newOffice = () => ({
-  name: '', address: '', timezone: 'Africa/Lagos', wifiSSID: '',
+  name: '', address: '', timezone: 'Africa/Lagos', wifiSSID: '', publicIp: '',
   openTime: '08:00', closeTime: '17:00', breakMinutes: 60,
   graceMinutes: 30, lateAfterMinutes: 90, gracePenalty: 0, latePenalty: 0,
   breakStart: '13:00', breakEnd: '14:00',
@@ -116,7 +116,8 @@ function OrgModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
                 <p className="text-[11px] text-[var(--text-muted)] mt-1">Employees can only take breaks within this window — prevents cheating the system.</p>
               </div>
 
-              <div><label className={lbl}>Company WiFi (SSID) — this office's own network</label><input className={inp} value={o.wifiSSID} onChange={(e) => updateOffice(i,'wifiSSID',e.target.value)} placeholder="e.g. Acme_Office_5G"/><p className="text-[11px] text-[var(--text-muted)] mt-1">Employees must be on this exact network to check in. Leave blank to set later in Security Settings.</p></div>
+              <div><label className={lbl}>Company WiFi (SSID) — Android app</label><input className={inp} value={o.wifiSSID} onChange={(e) => updateOffice(i,'wifiSSID',e.target.value)} placeholder="e.g. Acme_Office_5G"/><p className="text-[11px] text-[var(--text-muted)] mt-1">Android employees must be on this exact network to check in.</p></div>
+              <div><label className={lbl}>Office Public IP — iOS / Web (PWA) app</label><input className={inp} value={o.publicIp} onChange={(e) => updateOffice(i,'publicIp',e.target.value)} placeholder="e.g. 102.89.34.12"/><p className="text-[11px] text-[var(--text-muted)] mt-1">Browsers can't read Wi-Fi names, so iOS/web check-ins verify this office's internet IP. On the office Wi-Fi, open whatismyip.com to find it. Leave blank to disable web check-in.</p></div>
             </div>))}
           </div>}
           {step === 3 && <div>
@@ -186,7 +187,7 @@ function EditOrgModal({ org, onClose, onSaved }: { org: any; onClose: () => void
   const [tier, setTier]       = useState(org.subscriptionTier ?? 'starter');
   const [offices, setOffices] = useState<any[]>(() => (org.offices ?? []).map((o: any) => ({
     id: o.id, name: o.name ?? '', address: o.address ?? '', timezone: o.timezone ?? 'Africa/Lagos',
-    wifiSSID: o.wifiSSID ?? '', openTime: o.openTime ?? '08:00', closeTime: o.closeTime ?? '17:00',
+    wifiSSID: o.wifiSSID ?? '', publicIp: o.publicIp ?? '', openTime: o.openTime ?? '08:00', closeTime: o.closeTime ?? '17:00',
     breakMinutes: o.breakMinutes ?? 60,
     graceMinutes: o.graceMinutes ?? 30, lateAfterMinutes: o.lateAfterMinutes ?? 90,
     gracePenalty: o.gracePenalty ?? 0, latePenalty: o.latePenalty ?? 0,
@@ -243,7 +244,8 @@ function EditOrgModal({ org, onClose, onSaved }: { org: any; onClose: () => void
                 <div><label className={lbl}>Break Start</label><input className={inp} type="time" value={o.breakStart} onChange={(e) => updOffice(i,'breakStart',e.target.value)}/></div>
                 <div><label className={lbl}>Break End</label><input className={inp} type="time" value={o.breakEnd} onChange={(e) => updOffice(i,'breakEnd',e.target.value)}/></div>
               </div>
-              <div><label className={lbl}>Company WiFi (SSID)</label><input className={inp} value={o.wifiSSID} onChange={(e) => updOffice(i,'wifiSSID',e.target.value)} placeholder="Leave blank to disable WiFi check"/></div>
+              <div><label className={lbl}>Company WiFi (SSID) — Android</label><input className={inp} value={o.wifiSSID} onChange={(e) => updOffice(i,'wifiSSID',e.target.value)} placeholder="Leave blank to disable WiFi check"/></div>
+              <div><label className={lbl}>Office Public IP — iOS / Web</label><input className={inp} value={o.publicIp} onChange={(e) => updOffice(i,'publicIp',e.target.value)} placeholder="e.g. 102.89.34.12"/></div>
             </div>
           ))}
         </div>

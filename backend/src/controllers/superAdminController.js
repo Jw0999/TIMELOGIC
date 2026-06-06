@@ -72,8 +72,9 @@ const createOrg = async (req, res, next) => {
               name: o.name || 'Main Office',
               address: o.address || '',
               timezone: o.timezone || 'UTC',
-              // Each org sets its OWN Wi-Fi. Blank → null (set later in Security Settings).
+              // Each org sets its OWN Wi-Fi (Android SSID) + public IP (iOS/web network).
               wifiSSID: (o.wifiSSID && o.wifiSSID.trim()) ? o.wifiSSID.trim() : null,
+              publicIp: (o.publicIp && o.publicIp.trim()) ? o.publicIp.trim() : null,
               openTime:  o.openTime  || '08:00',
               closeTime: o.closeTime || '17:00',
               breakMinutes: Number.isFinite(+o.breakMinutes) ? parseInt(o.breakMinutes, 10) : 60,
@@ -180,6 +181,7 @@ const updateOrg = async (req, res, next) => {
         if (o.address   !== undefined) data.address   = o.address;
         if (o.timezone  !== undefined) data.timezone  = o.timezone;
         if (o.wifiSSID  !== undefined) data.wifiSSID  = (o.wifiSSID && o.wifiSSID.trim()) ? o.wifiSSID.trim() : null;
+        if (o.publicIp  !== undefined) data.publicIp  = (o.publicIp && o.publicIp.trim()) ? o.publicIp.trim() : null;
         if (o.openTime  !== undefined) data.openTime  = o.openTime || '08:00';
         if (o.closeTime !== undefined) data.closeTime = o.closeTime || '17:00';
         if (o.breakMinutes !== undefined) data.breakMinutes = Number.isFinite(+o.breakMinutes) ? parseInt(o.breakMinutes, 10) : 60;
