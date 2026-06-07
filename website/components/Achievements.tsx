@@ -9,7 +9,7 @@ export function Achievements() {
   const reduce = useReducedMotion();
 
   return (
-    <section id="achievements" className="relative py-24 sm:py-32">
+    <section id="achievements" className="section-light relative py-24 sm:py-32">
       <div className="mx-auto max-w-6xl px-5">
         <motion.div
           variants={stagger(0, 0.08)}
