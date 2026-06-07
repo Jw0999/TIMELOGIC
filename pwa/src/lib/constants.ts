@@ -27,18 +27,19 @@ export const LEAVE_TYPES = [
   { type: "COMPASSIONATE", label: "Compassionate Leave" },
 ];
 
-// Mirrors mobile StatusBadge STATUS_MAP.
+// Mirrors mobile StatusBadge STATUS_MAP. Uses CSS-variable tokens so badge
+// colours swap automatically between light and dark themes.
 export const STATUS_MAP: Record<string, { bg: string; text: string; label: string }> = {
-  PRESENT: { bg: "#D1FAE5", text: "#065F46", label: "Present" },
-  LATE: { bg: "#FEF3C7", text: "#92400E", label: "Late" },
-  ABSENT: { bg: "#FEE2E2", text: "#991B1B", label: "Absent" },
-  ON_LEAVE: { bg: "#EFF6FF", text: "#1E3A8A", label: "On Leave" },
-  HALF_DAY: { bg: "#FFEDD5", text: "#F97316", label: "Half Day" },
-  WEEKEND: { bg: "#F1F5F9", text: "#64748B", label: "Weekend" },
-  HOLIDAY: { bg: "#CCFBF1", text: "#14B8A6", label: "Holiday" },
-  ACTIVE: { bg: "#D1FAE5", text: "#065F46", label: "Active" },
-  SUSPENDED: { bg: "#FEE2E2", text: "#991B1B", label: "Suspended" },
-  REVIEW_REQUIRED: { bg: "#FFEDD5", text: "#F97316", label: "Under Review" },
+  PRESENT: { bg: "var(--c-success-bg)", text: "var(--c-success-dark)", label: "Present" },
+  LATE: { bg: "var(--c-warning-bg)", text: "var(--c-warning-dark)", label: "Late" },
+  ABSENT: { bg: "var(--c-danger-bg)", text: "var(--c-danger-dark)", label: "Absent" },
+  ON_LEAVE: { bg: "var(--c-primary-bg)", text: "var(--c-primary-dark)", label: "On Leave" },
+  HALF_DAY: { bg: "var(--c-orange-bg)", text: "var(--c-orange)", label: "Half Day" },
+  WEEKEND: { bg: "var(--c-gray100)", text: "var(--c-gray500)", label: "Weekend" },
+  HOLIDAY: { bg: "var(--c-teal-bg)", text: "var(--c-teal)", label: "Holiday" },
+  ACTIVE: { bg: "var(--c-success-bg)", text: "var(--c-success-dark)", label: "Active" },
+  SUSPENDED: { bg: "var(--c-danger-bg)", text: "var(--c-danger-dark)", label: "Suspended" },
+  REVIEW_REQUIRED: { bg: "var(--c-orange-bg)", text: "var(--c-orange)", label: "Under Review" },
 };
 
 export const LEAVE_COLORS: Record<string, string> = {

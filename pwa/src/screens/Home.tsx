@@ -181,7 +181,7 @@ export default function Home({
           <div className="flex-1">
             <p className="text-sm font-semibold text-success-dark">Day complete — see you next session!</p>
             {status?.totalWorkHours && (
-              <p className="mt-0.5 text-xs text-success-dark/80">Total: {status.totalWorkHours} hours worked</p>
+              <p className="mt-0.5 text-xs text-success-dark">Total: {status.totalWorkHours} hours worked</p>
             )}
           </div>
         </div>
@@ -238,7 +238,7 @@ export default function Home({
       </div>
 
       {toast && (
-        <div className="fixed inset-x-4 bottom-24 z-40 mx-auto max-w-md rounded-xl bg-gray800 px-4 py-3 text-center text-[13.5px] font-medium text-white shadow-lg">
+        <div className="fixed inset-x-4 bottom-24 z-40 mx-auto max-w-md rounded-xl bg-gray800 px-4 py-3 text-center text-[13.5px] font-medium text-gray50 shadow-lg">
           {toast}
         </div>
       )}

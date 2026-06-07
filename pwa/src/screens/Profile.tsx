@@ -1,12 +1,20 @@
 import { useEffect, useState } from "react";
-import { Mail, IdCard, Users, Clock, Lock, LogOut, Loader2 } from "lucide-react";
+import { Mail, IdCard, Users, Clock, Lock, LogOut, Loader2, Sun, Moon, Smartphone } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useTheme, type ThemeMode } from "../context/ThemeContext";
 import { FILE_BASE } from "../config";
 import { getLeaveBalances, type LeaveBalance } from "../services/data";
 import StatusBadge from "../components/StatusBadge";
 
+const THEME_OPTS: [ThemeMode, typeof Sun, string][] = [
+  ["light", Sun, "Light"],
+  ["dark", Moon, "Dark"],
+  ["system", Smartphone, "System"],
+];
+
 export default function Profile() {
   const { user, logout } = useAuth();
+  const { mode, setMode } = useTheme();
   const [balances, setBalances] = useState<LeaveBalance[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -82,6 +90,28 @@ export default function Profile() {
             </div>
           ))
         )}
+      </div>
+
+      {/* Appearance — light / dark / system (matches Android) */}
+      <div className="mb-3.5 rounded-[18px] bg-card p-[18px] shadow-sm">
+        <p className="mb-3 text-sm font-bold text-gray700">Appearance</p>
+        <div className="flex gap-2.5">
+          {THEME_OPTS.map(([m, Icon, label]) => {
+            const on = mode === m;
+            return (
+              <button
+                key={m}
+                onClick={() => setMode(m)}
+                className={`flex flex-1 flex-col items-center gap-1 rounded-xl border-[1.5px] py-2.5 ${
+                  on ? "border-primary bg-primary-bg" : "border-gray200 bg-gray50"
+                }`}
+              >
+                <Icon size={20} className={on ? "text-primary" : "text-gray500"} />
+                <span className={`text-[11px] ${on ? "font-bold text-primary" : "font-semibold text-gray600"}`}>{label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <button

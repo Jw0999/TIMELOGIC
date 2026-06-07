@@ -1,29 +1,30 @@
 /** @type {import('tailwindcss').Config} */
-// Palette mirrors the Android app (mobile/src/constants/theme.ts light Colors)
+// Colors reference CSS variables (defined in index.css) so light/dark swap
+// automatically. Palette mirrors the Android app (mobile light + dark Colors).
 export default {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
-        primary: "#1D4ED8",
-        "primary-light": "#3B82F6",
-        "primary-dark": "#1E3A8A",
-        "primary-bg": "#EFF6FF",
-        "primary-border": "#BFDBFE",
-        bg: "#F8FAFC",
-        card: "#FFFFFF",
-        gray50: "#F8FAFC", gray100: "#F1F5F9", gray200: "#E2E8F0",
-        gray300: "#CBD5E1", gray400: "#94A3B8", gray500: "#64748B",
-        gray600: "#475569", gray700: "#334155", gray800: "#1E293B", gray900: "#0F172A",
-        ink: "#1E293B", muted: "#64748B", line: "#F1F5F9",
-        success: "#10B981", "success-bg": "#D1FAE5", "success-dark": "#065F46",
-        warning: "#F59E0B", "warning-bg": "#FEF3C7", "warning-dark": "#92400E",
-        danger: "#EF4444", "danger-bg": "#FEE2E2", "danger-dark": "#991B1B",
-        orange: "#F97316",
+        primary: "var(--c-primary)",
+        "primary-light": "var(--c-primary-light)",
+        "primary-dark": "var(--c-primary-dark)",
+        "primary-bg": "var(--c-primary-bg)",
+        "primary-border": "var(--c-primary-border)",
+        bg: "var(--c-bg)", card: "var(--c-card)",
+        gray50: "var(--c-gray50)", gray100: "var(--c-gray100)", gray200: "var(--c-gray200)",
+        gray300: "var(--c-gray300)", gray400: "var(--c-gray400)", gray500: "var(--c-gray500)",
+        gray600: "var(--c-gray600)", gray700: "var(--c-gray700)", gray800: "var(--c-gray800)",
+        gray900: "var(--c-gray900)",
+        ink: "var(--c-ink)", muted: "var(--c-muted)", line: "var(--c-line)",
+        success: "var(--c-success)", "success-bg": "var(--c-success-bg)", "success-dark": "var(--c-success-dark)",
+        warning: "var(--c-warning)", "warning-bg": "var(--c-warning-bg)", "warning-dark": "var(--c-warning-dark)",
+        danger: "var(--c-danger)", "danger-bg": "var(--c-danger-bg)", "danger-dark": "var(--c-danger-dark)",
+        orange: "var(--c-orange)",
+        white: "#FFFFFF",
       },
-      fontFamily: {
-        sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
-      },
+      fontFamily: { sans: ["Inter", "system-ui", "-apple-system", "sans-serif"] },
       boxShadow: {
         sm: "0 1px 3px rgba(2,8,23,0.06), 0 1px 2px rgba(2,8,23,0.04)",
         md: "0 4px 12px rgba(29,78,216,0.08), 0 2px 6px rgba(2,8,23,0.05)",

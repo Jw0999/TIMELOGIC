@@ -83,7 +83,7 @@ export default function Break({ initial, onBack }: { initial: BreakType; onBack:
                     key={bt.type}
                     onClick={() => setSelected(bt)}
                     className="relative flex w-[47%] flex-col items-center gap-1.5 rounded-[14px] border bg-gray50 p-3.5"
-                    style={on ? { borderColor: bt.color, borderWidth: 2, backgroundColor: bt.color + "10" } : { borderColor: "#E2E8F0" }}
+                    style={on ? { borderColor: bt.color, borderWidth: 2, backgroundColor: bt.color + "10" } : { borderColor: "var(--c-gray200)" }}
                   >
                     <span className="grid h-11 w-11 place-items-center rounded-xl" style={{ backgroundColor: bt.color + "18" }}>
                       <bt.icon size={22} style={{ color: bt.color }} />

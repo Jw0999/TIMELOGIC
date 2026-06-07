@@ -11,7 +11,7 @@ const TABS: { key: TabKey; label: string; icon: LucideIcon }[] = [
 export default function TabBar({ active, onChange }: { active: TabKey; onChange: (t: TabKey) => void }) {
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-30 mx-auto flex max-w-md items-stretch border-t border-gray200 bg-white"
+      className="fixed inset-x-0 bottom-0 z-30 mx-auto flex max-w-md items-stretch border-t border-gray200 bg-card"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       {TABS.map(({ key, label, icon: Icon }) => {
