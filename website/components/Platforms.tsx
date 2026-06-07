@@ -11,8 +11,8 @@ export function Platforms() {
   const reduce = useReducedMotion();
 
   return (
-    <section id="platforms" className="relative py-24 sm:py-32">
-      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px]">
+    <section id="platforms" className="relative overflow-hidden py-24 sm:py-32">
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] overflow-hidden">
         <div className="absolute left-1/2 top-0 h-[360px] w-[820px] -translate-x-1/2 rounded-full glow-radial opacity-25 blur-[70px]" />
       </div>
 

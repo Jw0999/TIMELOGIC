@@ -50,7 +50,7 @@ export function Contact() {
   const labelCls = "mb-1.5 block text-xs font-semibold text-muted";
 
   return (
-    <section id="contact" className="relative py-24 sm:py-32">
+    <section id="contact" className="relative overflow-hidden py-24 sm:py-32">
       <div className="mx-auto max-w-6xl px-5">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
           {/* left: pitch + details */}
