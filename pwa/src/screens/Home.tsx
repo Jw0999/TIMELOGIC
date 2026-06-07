@@ -1,256 +1,261 @@
 import { useCallback, useEffect, useState } from "react";
 import {
-  LogOut, Check, Clock, Coffee, CalendarDays, Loader2, RefreshCw,
-  LogIn as LogInIcon, CircleDot, History as HistoryIcon,
+  LogOut, LogIn as LogInIcon, Fingerprint, DoorOpen, CheckCircle2, Coffee,
+  FileText, Loader2, Clock,
 } from "lucide-react";
-import { api, type ApiError } from "../services/api";
-import { getDeviceId } from "../services/device";
-import { PLATFORM } from "../config";
 import { useAuth } from "../context/AuthContext";
-import CheckInModal from "../components/CheckInModal";
-import LeaveModal from "../components/LeaveModal";
+import { FILE_BASE } from "../config";
+import { BREAK_TYPES, type BreakType } from "../lib/constants";
+import {
+  getStatus, getCurrentSession, getActiveBreak, getLeaveBalances, requestChallenge,
+  checkOut as apiCheckOut, type StatusRec, type BreakRec, type SessionInfo, type LeaveBalance,
+} from "../services/data";
+import type { ApiError } from "../services/api";
+import StatusBadge from "../components/StatusBadge";
+import ChallengeModal from "../components/ChallengeModal";
 
-interface SessionInfo { sessionId: string; sessionName: string; office?: string; status: string }
-interface BreakRec { id: string; breakType: string; startTime: string; endTime: string | null; durationMinutes: number | null }
-interface StatusRec {
-  id: string; sessionId: string; clockInTime: string | null; clockOutTime: string | null;
-  status: string; totalWorkHours: string | null; breakRecords?: BreakRec[];
+const fmt = (t: string | null) =>
+  t ? new Date(t).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true }) : "—";
+
+function greeting() {
+  const h = new Date().getHours();
+  return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
 }
-interface HistRec { id: string; date: string; status: string; clockInTime: string | null; clockOutTime: string | null; totalWorkHours: string | null }
 
-const fmt = (iso: string | null) =>
-  iso ? new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "—";
-
-export default function Home() {
+export default function Home({
+  onOpenBreak,
+  onOpenLeave,
+}: {
+  onOpenBreak: (b: BreakType) => void;
+  onOpenLeave: () => void;
+}) {
   const { user, logout } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [session, setSession] = useState<SessionInfo | null>(null);
   const [status, setStatus] = useState<StatusRec | null>(null);
+  const [session, setSession] = useState<SessionInfo | null>(null);
   const [activeBreak, setActiveBreak] = useState<BreakRec | null>(null);
-  const [history, setHistory] = useState<HistRec[]>([]);
-  const [busy, setBusy] = useState<string>("");
+  const [balances, setBalances] = useState<LeaveBalance[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [checkingIn, setCheckingIn] = useState(false);
+  const [challenge, setChallenge] = useState<{ sessionId: string; code: string } | null>(null);
   const [toast, setToast] = useState("");
-  const [showCheckIn, setShowCheckIn] = useState(false);
-  const [showLeave, setShowLeave] = useState(false);
 
   const load = useCallback(async () => {
-    const [s, st, br, hist] = await Promise.allSettled([
-      api.get<SessionInfo>("/attendance/current-session"),
-      api.get<StatusRec>("/attendance/status"),
-      api.get<BreakRec | null>("/breaks/active"),
-      api.get<HistRec[]>("/attendance/history"),
+    const [st, se, br, lb] = await Promise.allSettled([
+      getStatus(), getCurrentSession(), getActiveBreak(), getLeaveBalances(),
     ]);
-    setSession(s.status === "fulfilled" ? s.value : null);
     setStatus(st.status === "fulfilled" ? st.value : null);
+    setSession(se.status === "fulfilled" ? se.value : null);
     setActiveBreak(br.status === "fulfilled" ? br.value : null);
-    setHistory(hist.status === "fulfilled" ? (Array.isArray(hist.value) ? hist.value : []) : []);
+    setBalances(lb.status === "fulfilled" ? lb.value : []);
     setLoading(false);
   }, []);
 
   useEffect(() => { load(); }, [load]);
+  const flash = (m: string) => { setToast(m); setTimeout(() => setToast(""), 3500); };
 
-  const flash = (m: string) => { setToast(m); setTimeout(() => setToast(""), 3000); };
+  const today = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  const hasCheckedIn = !!status?.clockInTime;
+  const hasCheckedOut = !!status?.clockOutTime;
+  const onBreak = !!activeBreak;
+  const sid = status?.sessionId ?? session?.sessionId ?? "";
+  const faceUri = user?.profileImageUrl ? `${FILE_BASE}${user.profileImageUrl}` : null;
 
-  async function run(label: string, fn: () => Promise<void>, done?: string) {
-    setBusy(label);
+  async function handleCheckIn() {
+    setCheckingIn(true);
     try {
-      await fn();
-      await load();
-      if (done) flash(done);
+      const se = await getCurrentSession().catch(() => null);
+      if (!se?.sessionId) { flash("No active session yet. Please wait for your admin."); return; }
+      const { code } = await requestChallenge(se.sessionId);
+      setChallenge({ sessionId: se.sessionId, code });
     } catch (e) {
       flash((e as ApiError).message);
     } finally {
-      setBusy("");
+      setCheckingIn(false);
     }
   }
 
-  const sid = status?.sessionId ?? session?.sessionId ?? "";
-  const checkedIn = !!status?.clockInTime;
-  const checkedOut = !!status?.clockOutTime;
-  const onBreak = !!activeBreak;
+  async function handleCheckOut() {
+    if (!window.confirm("Are you sure you want to clock out?")) return;
+    try {
+      await apiCheckOut(sid);
+      await load();
+      flash("Checked out");
+    } catch (e) {
+      flash((e as ApiError).message);
+    }
+  }
 
   if (loading) {
-    return (
-      <div className="flex min-h-full items-center justify-center">
-        <Loader2 size={26} className="spin text-sky" />
-      </div>
-    );
+    return <div className="flex min-h-full items-center justify-center"><Loader2 size={26} className="spin text-primary" /></div>;
   }
 
   return (
-    <div className="mx-auto min-h-full w-full max-w-md px-5 pb-10 pt-6">
-      {/* header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="grid h-11 w-11 place-items-center overflow-hidden rounded-2xl bg-white">
-            <img src="/icon-192.png" alt="" className="h-9 w-9 object-contain" />
-          </span>
-          <div>
-            <p className="text-[15px] font-bold leading-tight">
-              {user?.firstName} {user?.lastName}
-            </p>
-            <p className="text-[12px] text-[#9aabce]">{user?.organization?.name ?? user?.employeeCode}</p>
-          </div>
+    <div className="mx-auto min-h-full w-full max-w-md px-5 pb-28 pt-5">
+      {/* Header */}
+      <div className="mb-5 flex items-start justify-between">
+        <div>
+          <p className="text-[17px] font-bold text-ink">{greeting()}, {user?.firstName} 👋</p>
+          <p className="mt-0.5 text-xs text-muted">{today}</p>
         </div>
-        <button onClick={logout} aria-label="Sign out" className="grid h-10 w-10 place-items-center rounded-xl text-[#9aabce] ring-1 ring-white/10">
-          <LogOut size={18} />
+        <button onClick={() => { if (window.confirm("Sign out?")) logout(); }} className="rounded-[10px] bg-gray100 p-1.5">
+          <LogOut size={22} className="text-gray500" />
         </button>
       </div>
 
-      {/* status card */}
-      <div className="card overflow-hidden p-5">
-        {checkedIn ? (
-          <div className="flex items-center gap-3">
-            <span className={`grid h-12 w-12 place-items-center rounded-full ${status?.status === "LATE" ? "bg-amber-400/15" : "bg-emerald-400/15"}`}>
-              <Check size={24} className={status?.status === "LATE" ? "text-amber-400" : "text-emerald-400"} />
-            </span>
-            <div>
-              <p className="text-[12px] text-[#9aabce]">{checkedOut ? "Checked out" : "Checked in"}</p>
-              <p className="text-xl font-extrabold tracking-tight">
-                {status?.status === "LATE" ? "Late" : "Present"}
-              </p>
-            </div>
-            <div className="ml-auto text-right text-[12px] text-[#9aabce]">
-              <p>In {fmt(status?.clockInTime ?? null)}</p>
-              {checkedOut && <p>Out {fmt(status?.clockOutTime ?? null)}</p>}
-            </div>
-          </div>
+      {/* Brand row */}
+      <div className="mb-5 flex items-center gap-3">
+        {faceUri ? (
+          <img src={faceUri} alt="" className="h-12 w-12 rounded-full border-2 border-primary object-cover" />
         ) : (
-          <div className="flex items-center gap-3">
-            <span className="grid h-12 w-12 place-items-center rounded-full bg-white/[0.05]">
-              <CircleDot size={22} className="text-[#9aabce]" />
-            </span>
-            <div>
-              <p className="text-[12px] text-[#9aabce]">Today</p>
-              <p className="text-xl font-extrabold tracking-tight">Not checked in</p>
-            </div>
-          </div>
+          <span className="grid h-12 w-12 place-items-center overflow-hidden rounded-[14px] border border-line bg-white">
+            <img src="/icon-192.png" alt="" className="h-10 w-10 object-contain" />
+          </span>
         )}
-
-        <div className="mt-4 flex items-center gap-2 rounded-xl bg-white/[0.03] px-3 py-2 text-[12.5px] ring-1 ring-white/10">
-          <Clock size={14} className="text-sky" />
-          {session ? (
-            <span className="text-[#9aabce]">
-              Session open · <span className="text-[#e9eefb]">{session.office ?? session.sessionName}</span>
-            </span>
-          ) : (
-            <span className="text-[#9aabce]">No active session. Wait for it to open or for your admin.</span>
-          )}
+        <div>
+          <p className="text-lg font-extrabold text-ink">TimeLogic</p>
+          <p className="text-xs text-muted">{user?.employeeCode ?? user?.email}</p>
         </div>
       </div>
 
-      {/* primary action */}
-      <div className="mt-4">
-        {!checkedIn && (
-          <button
-            disabled={!session || !!busy}
-            onClick={() => setShowCheckIn(true)}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand py-4 text-[16px] font-bold text-white shadow-[0_16px_44px_-14px_rgba(37,99,235,0.85)] active:scale-[0.99] disabled:opacity-50"
-          >
-            <LogInIcon size={19} /> Check in
-          </button>
-        )}
-        {checkedIn && !checkedOut && (
-          <button
-            disabled={!!busy}
-            onClick={() => run("out", () => api.post("/attendance/check-out", { sessionId: sid, platform: PLATFORM, deviceId: getDeviceId() }), "Checked out")}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white/[0.05] py-4 text-[16px] font-bold text-[#e9eefb] ring-1 ring-white/10 active:scale-[0.99] disabled:opacity-60"
-          >
-            {busy === "out" ? <Loader2 size={19} className="spin" /> : <LogOut size={19} />} Check out
-          </button>
-        )}
-        {checkedOut && (
-          <div className="rounded-2xl bg-emerald-400/[0.06] py-4 text-center text-[15px] font-semibold text-emerald-300 ring-1 ring-emerald-400/20">
-            You’re done for today
+      {/* Status card */}
+      <div className="mb-4 rounded-[18px] bg-card p-[18px] shadow-md">
+        <div className="mb-3.5 flex items-center justify-between">
+          <p className="text-sm font-bold text-gray700">Today's Status</p>
+          {status?.status ? <StatusBadge status={status.status} /> : null}
+        </div>
+        <div className="flex justify-around">
+          {[
+            { icon: LogInIcon, label: "Clock In", value: fmt(status?.clockInTime ?? null), color: "#1D4ED8" },
+            { icon: DoorOpen, label: "Clock Out", value: fmt(status?.clockOutTime ?? null), color: "#F97316" },
+            { icon: Clock, label: "Shift", value: user?.shiftType ?? "—", color: "#10B981" },
+          ].map((it, i) => (
+            <div key={it.label} className="flex items-center">
+              <div className="flex flex-col items-center gap-1">
+                <it.icon size={18} style={{ color: it.color }} />
+                <span className="mt-0.5 text-[11px] text-muted">{it.label}</span>
+                <span className="text-sm font-bold text-ink">{it.value}</span>
+              </div>
+              {i < 2 && <div className="mx-3 h-9 w-px bg-line" />}
+            </div>
+          ))}
+        </div>
+        {onBreak && (
+          <div className="mt-3 flex items-center gap-1.5 rounded-lg bg-warning-bg p-2">
+            <Coffee size={16} className="text-warning" />
+            <span className="text-xs text-warning-dark">
+              On {activeBreak?.breakType?.replace(/_/g, " ").toLowerCase()} break since {fmt(activeBreak?.startTime ?? null)}
+            </span>
           </div>
         )}
       </div>
 
-      {/* breaks + leave */}
-      {checkedIn && !checkedOut && (
-        <div className="mt-3 grid grid-cols-2 gap-3">
-          {onBreak ? (
-            <button
-              disabled={!!busy}
-              onClick={() => run("break", () => api.post(`/breaks/${activeBreak!.id}/end`, {}), "Break ended")}
-              className="flex items-center justify-center gap-2 rounded-xl bg-amber-400/15 py-3 text-[14px] font-semibold text-amber-300 ring-1 ring-amber-400/25 active:scale-[0.99]"
-            >
-              {busy === "break" ? <Loader2 size={16} className="spin" /> : <Coffee size={16} />} End break
-            </button>
-          ) : (
-            <button
-              disabled={!!busy}
-              onClick={() => run("break", () => api.post("/breaks", { breakType: "SHORT_BREAK" }), "Break started")}
-              className="flex items-center justify-center gap-2 rounded-xl bg-white/[0.05] py-3 text-[14px] font-semibold text-[#e9eefb] ring-1 ring-white/10 active:scale-[0.99]"
-            >
-              {busy === "break" ? <Loader2 size={16} className="spin" /> : <Coffee size={16} />} Start break
-            </button>
-          )}
+      {/* Check in / out / completed */}
+      {!hasCheckedOut ? (
+        !hasCheckedIn ? (
           <button
-            onClick={() => setShowLeave(true)}
-            className="flex items-center justify-center gap-2 rounded-xl bg-white/[0.05] py-3 text-[14px] font-semibold text-[#e9eefb] ring-1 ring-white/10 active:scale-[0.99]"
+            onClick={handleCheckIn}
+            disabled={checkingIn}
+            className="mb-4 flex w-full items-center gap-3.5 rounded-[18px] bg-primary p-5 text-left shadow-lg active:scale-[0.99] disabled:opacity-70"
           >
-            <CalendarDays size={16} /> Request leave
+            {checkingIn ? <Loader2 size={26} className="spin text-white" /> : <Fingerprint size={26} className="text-white" />}
+            <div>
+              <p className="text-lg font-extrabold text-white">{checkingIn ? "Checking in…" : "Check In"}</p>
+              <p className="mt-0.5 text-xs text-white/75">{checkingIn ? "Please wait" : "Tap to start your day"}</p>
+            </div>
           </button>
+        ) : (
+          <button
+            onClick={handleCheckOut}
+            className="mb-4 flex w-full items-center gap-3.5 rounded-[18px] border-2 border-primary bg-card p-5 text-left shadow-sm active:scale-[0.99]"
+          >
+            <DoorOpen size={26} className="text-primary" />
+            <div>
+              <p className="text-lg font-extrabold text-primary">Check Out</p>
+              <p className="mt-0.5 text-xs text-muted">Tap to end your shift</p>
+            </div>
+          </button>
+        )
+      ) : (
+        <div className="mb-4 flex items-center gap-2.5 rounded-[14px] bg-success-bg p-4">
+          <CheckCircle2 size={26} className="text-success" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-success-dark">Day complete — see you next session!</p>
+            {status?.totalWorkHours && (
+              <p className="mt-0.5 text-xs text-success-dark/80">Total: {status.totalWorkHours} hours worked</p>
+            )}
+          </div>
         </div>
       )}
 
-      {!checkedIn && (
-        <button
-          onClick={() => setShowLeave(true)}
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-white/[0.05] py-3 text-[14px] font-semibold text-[#e9eefb] ring-1 ring-white/10 active:scale-[0.99]"
-        >
-          <CalendarDays size={16} /> Request leave
-        </button>
+      {/* Quick actions */}
+      {hasCheckedIn && !hasCheckedOut && (
+        <div className="mb-5">
+          <p className="mb-3 text-sm font-bold text-gray700">Quick Actions</p>
+          <div className="flex flex-wrap gap-2.5">
+            {BREAK_TYPES.map((b) => (
+              <button
+                key={b.type}
+                onClick={() => onOpenBreak(b)}
+                className="flex w-[30%] flex-col items-center gap-1 rounded-[14px] bg-card p-3 shadow-sm"
+              >
+                <span className="grid h-11 w-11 place-items-center rounded-xl" style={{ backgroundColor: b.color + "18" }}>
+                  <b.icon size={22} style={{ color: b.color }} />
+                </span>
+                <span className="text-xs font-bold text-ink">{b.label.split(" ")[0]}</span>
+                <span className="text-[10px] text-muted">{b.maxMinutes}m max</span>
+              </button>
+            ))}
+            <button onClick={onOpenLeave} className="flex w-[30%] flex-col items-center gap-1 rounded-[14px] bg-card p-3 shadow-sm">
+              <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary-bg">
+                <FileText size={22} className="text-primary" />
+              </span>
+              <span className="text-xs font-bold text-ink">Leave</span>
+              <span className="text-[10px] text-muted">Request</span>
+            </button>
+          </div>
+        </div>
       )}
 
-      {/* history */}
-      <div className="mt-7 flex items-center justify-between">
-        <h2 className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-wide text-[#9aabce]">
-          <HistoryIcon size={14} /> Recent
-        </h2>
-        <button onClick={() => load()} aria-label="Refresh" className="text-[#6b7ca3]">
-          <RefreshCw size={15} />
-        </button>
+      {/* Leave balances */}
+      <div className="mb-2">
+        <p className="mb-3 text-sm font-bold text-gray700">Leave Balances</p>
+        {balances.length === 0 ? (
+          <p className="text-[13px] italic text-muted">No leave data</p>
+        ) : (
+          <div className="flex gap-2.5 overflow-x-auto pb-1">
+            {balances.slice(0, 5).map((lb) => (
+              <div key={lb.type} className="w-[110px] flex-shrink-0 rounded-[14px] bg-card p-3.5 text-center shadow-sm">
+                <span className="mx-auto mb-1.5 block h-2 w-2 rounded-full" style={{ backgroundColor: lb.color }} />
+                <p className="mb-1 text-[10px] text-muted">{lb.label}</p>
+                <p className="text-[22px] font-extrabold leading-none" style={{ color: lb.color }}>
+                  {lb.remaining}<span className="text-[13px] text-muted">/{lb.entitled}</span>
+                </p>
+                <p className="mt-1 text-[10px] text-muted">days left</p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-      <ul className="mt-2 space-y-2">
-        {history.length === 0 && <li className="py-6 text-center text-[13px] text-[#6b7ca3]">No attendance history yet.</li>}
-        {history.slice(0, 8).map((h) => (
-          <li key={h.id} className="flex items-center justify-between rounded-xl bg-white/[0.025] px-3.5 py-3 ring-1 ring-white/[0.06]">
-            <div>
-              <p className="text-[13.5px] font-semibold">
-                {new Date(h.date).toLocaleDateString([], { weekday: "short", day: "numeric", month: "short" })}
-              </p>
-              <p className="text-[11.5px] text-[#9aabce]">In {fmt(h.clockInTime)} · Out {fmt(h.clockOutTime)}</p>
-            </div>
-            <span
-              className={`rounded-full px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-wide ${
-                h.status === "PRESENT" ? "bg-emerald-400/15 text-emerald-300"
-                : h.status === "LATE" ? "bg-amber-400/15 text-amber-300"
-                : "bg-white/5 text-[#9aabce]"
-              }`}
-            >
-              {h.status}
-            </span>
-          </li>
-        ))}
-      </ul>
 
-      {/* toast */}
       {toast && (
-        <div className="fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 mx-auto max-w-md rounded-xl bg-[#11203f] px-4 py-3 text-center text-[13.5px] font-medium text-[#e9eefb] shadow-2xl ring-1 ring-white/10">
+        <div className="fixed inset-x-4 bottom-24 z-40 mx-auto max-w-md rounded-xl bg-gray800 px-4 py-3 text-center text-[13.5px] font-medium text-white shadow-lg">
           {toast}
         </div>
       )}
 
-      {showCheckIn && session && (
-        <CheckInModal
-          sessionId={session.sessionId}
-          onClose={() => setShowCheckIn(false)}
-          onDone={() => { setShowCheckIn(false); load(); flash("Checked in"); }}
+      {challenge && (
+        <ChallengeModal
+          sessionId={challenge.sessionId}
+          code={challenge.code}
+          onClose={() => setChallenge(null)}
+          onDone={(rec) => {
+            setChallenge(null);
+            load();
+            const pen = rec?.penalty && rec.penalty > 0 ? ` · ₦${rec.penalty} penalty` : "";
+            flash(`Checked in${rec?.status ? ` (${rec.status})` : ""}${pen}`);
+          }}
         />
       )}
-      {showLeave && <LeaveModal onClose={() => setShowLeave(false)} />}
     </div>
   );
 }

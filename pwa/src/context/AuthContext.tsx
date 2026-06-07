@@ -9,6 +9,9 @@ export interface User {
   email: string;
   employeeCode: string | null;
   role: string;
+  status: string;
+  shiftType?: string;
+  profileImageUrl?: string | null;
   organization?: { id: string; name: string };
 }
 

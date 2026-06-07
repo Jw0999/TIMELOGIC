@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LogIn, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, LogIn, Loader2, Info } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
@@ -23,69 +23,79 @@ export default function Login() {
     if (!res.ok) setError(res.error ?? "Login failed.");
   }
 
-  const input =
-    "w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-[15px] text-[#e9eefb] placeholder-[#6b7ca3] outline-none focus:border-brand/60 focus:ring-2 focus:ring-brand/30";
+  const wrap = "flex items-center gap-2 rounded-xl border-[1.5px] border-gray200 bg-gray50 px-3 h-[50px]";
+  const input = "flex-1 bg-transparent text-[15px] text-ink outline-none placeholder-gray400";
 
   return (
-    <div className="flex min-h-full flex-col justify-center px-6 py-10">
+    <div className="min-h-full overflow-y-auto px-5 py-8">
       <div className="mx-auto w-full max-w-sm">
+        {/* Header */}
         <div className="mb-8 flex flex-col items-center text-center">
-          <span className="mb-4 grid h-20 w-20 place-items-center overflow-hidden rounded-3xl bg-white shadow-lg">
+          <div className="mb-3 grid h-20 w-20 place-items-center overflow-hidden rounded-[20px] bg-white shadow-lg">
             <img src="/icon-192.png" alt="TimeLogic" className="h-16 w-16 object-contain" />
-          </span>
-          <h1 className="text-2xl font-extrabold tracking-tight">Welcome back</h1>
-          <p className="mt-1 text-sm text-[#9aabce]">Sign in to mark your attendance</p>
+          </div>
+          <h1 className="text-[26px] font-extrabold tracking-tight text-ink">TimeLogic</h1>
+          <p className="mt-1.5 px-4 text-[13px] leading-[18px] text-muted">
+            Sign in with your credentials provided by your administrator
+          </p>
         </div>
 
-        <form onSubmit={submit} className="card p-5">
-          <label className="mb-1.5 block text-xs font-semibold text-[#9aabce]">
-            Email or Employee Code
-          </label>
-          <input
-            className={input}
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
-            placeholder="you@company.com"
-            autoCapitalize="none"
-            autoCorrect="off"
-            inputMode="email"
-          />
+        {/* Card */}
+        <form onSubmit={submit} className="rounded-[20px] bg-card p-6 shadow-md">
+          <h2 className="text-xl font-bold text-ink">Welcome Back</h2>
+          <p className="mb-5 mt-1 text-[13px] leading-[18px] text-muted">
+            Enter the email address and password your company administrator provided you.
+          </p>
 
-          <label className="mb-1.5 mt-4 block text-xs font-semibold text-[#9aabce]">Password</label>
-          <div className="relative">
+          <label className="mb-1.5 block text-[13px] font-semibold text-gray700">Work Email Address</label>
+          <div className={wrap}>
+            <Mail size={19} className="text-gray400" />
+            <input
+              className={input}
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              placeholder="your.email@company.com"
+              autoCapitalize="none"
+              autoCorrect="off"
+              inputMode="email"
+            />
+          </div>
+
+          <label className="mb-1.5 mt-4 block text-[13px] font-semibold text-gray700">Password</label>
+          <div className={wrap}>
+            <Lock size={19} className="text-gray400" />
             <input
               className={input}
               type={show ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Your password"
+              placeholder="Enter your password"
             />
-            <button
-              type="button"
-              onClick={() => setShow((s) => !s)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b7ca3]"
-              aria-label={show ? "Hide password" : "Show password"}
-            >
-              {show ? <EyeOff size={18} /> : <Eye size={18} />}
+            <button type="button" onClick={() => setShow((s) => !s)} className="text-gray400" aria-label="Toggle password">
+              {show ? <EyeOff size={19} /> : <Eye size={19} />}
             </button>
           </div>
 
-          {error && <p className="mt-3 text-[13px] font-medium text-red-400">{error}</p>}
+          {error && <p className="mt-3 text-[13px] font-medium text-danger">{error}</p>}
 
           <button
             type="submit"
             disabled={loading}
-            className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_36px_-12px_rgba(37,99,235,0.8)] active:scale-[0.99] disabled:opacity-70"
+            className="mt-5 flex h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-primary text-base font-bold text-white shadow-lg active:scale-[0.99] disabled:opacity-70"
           >
-            {loading ? <Loader2 size={18} className="spin" /> : <LogIn size={18} />}
+            {loading ? <Loader2 size={20} className="spin" /> : <LogIn size={20} />}
             {loading ? "Signing in…" : "Sign In"}
           </button>
+
+          <div className="mt-4 flex items-start gap-1.5">
+            <Info size={14} className="mt-0.5 flex-shrink-0 text-gray400" />
+            <p className="text-[12px] leading-4 text-gray400">
+              Your login credentials are provided by your company administrator. Contact them if you need help.
+            </p>
+          </div>
         </form>
 
-        <p className="mt-5 flex items-center justify-center gap-1.5 text-center text-xs text-[#6b7ca3]">
-          <ShieldCheck size={13} className="text-sky" />
-          This phone becomes your registered device.
-        </p>
+        <p className="mt-6 text-center text-[11px] text-gray400">© {new Date().getFullYear()} TimeLogic · v1.0.0</p>
       </div>
     </div>
   );
